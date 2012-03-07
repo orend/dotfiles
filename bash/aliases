@@ -10,9 +10,10 @@ alias cdpbc="cd ~/src/pbc"
 alias cdvs="cd ~/src/vsync"
 alias b="bundle exec"
 alias vsync="bundle exec irb -r ./lib/apps/vsync_app"
+alias ..="cd .."
 
 # greps
-grep-src() { fgrep "$1" * -r $2 $3 $4 $std_excludes; }
+grep-src() { fgrep "$1" * -r -n $2 $3 $4 $std_excludes; }
 grep-web() { fgrep "$1" * -r $2 $3 $4 --include "*.erb" --include "*.haml" --include "*.sass" --include "*.html" --include "*.css" --include "*.js"; }
 grep-java() { fgrep "$1" * -r $2 $3 $4 --include "*.java"; }
 grep-rb() { fgrep "$1" * -r $2 $3 $4 --include "*.rb" --include "*.rake" --exclude="*-db-200*"; }
@@ -47,7 +48,6 @@ alias lh="ls -lh"
 alias ll='ls -lhG'  # -l long listing, human readable, no group info
 alias lt='ls -lt' # sort with recently modified first
 alias md='mkdir -p'
-alias s='cd ..'   # up one dir
 
 function take() {
     mkdir -p "$1"

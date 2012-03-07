@@ -8,3 +8,9 @@ export LSCOLORS=Exfxcxdxbxegedabagacad
 
 # Tell grep to highlight matches
 export GREP_OPTIONS='--color=auto'
+
+# history
+export HISTCONTROL=ignorespace:erasedups
+export HISTIGNORE="l:ll:pwd"
+export HISTFILESIZE=1000000000
+export HISTSIZE=1000000
