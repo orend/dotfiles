@@ -11,6 +11,7 @@ alias cdvs="cd ~/src/vsync"
 alias b="bundle exec"
 alias vsync="bundle exec irb -r ./lib/apps/vsync_app"
 alias ..="cd .."
+alias cdas="cd ~/dev_exclusions/assistly"
 
 # greps
 grep-src() { fgrep "$1" * -r -n $2 $3 $4 $std_excludes; }
