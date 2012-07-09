@@ -30,7 +30,7 @@
     edit-unmerged = "!f() { git ls-files --unmerged | cut -f2 | sort -u ; }; gvim `f`"
     add-unmerged = "!f() { git ls-files --unmerged | cut -f2 | sort -u ; }; git add `f`"
 
-    diff-branch = !git diff $(git merge-base HEAD master)
+    diff-branch = diff master...
 
   # Fancy logging.
     #   h = head
