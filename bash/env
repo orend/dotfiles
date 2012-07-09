@@ -3,6 +3,7 @@ export PATH="~/bin:~/.bin:/usr/local/homebrew/bin:/usr/local/bin:/usr/local/sbin
 # Set PATH, CDPATH, EDITOR, etc.
 
 export EDITOR="subl -w"
+export EDITOR_NO_WAIT=${EDITOR/\-w/}
 export CLICOLOR=1
 export LSCOLORS=Exfxcxdxbxegedabagacad
 

@@ -250,3 +250,15 @@ function __rm_single_file(){
     fi
 }
 
+function open_all_files_changed_from_master {
+  if [ -d .git ]; then
+    $EDITOR_NO_WAIT .
+    for file in `git diff --name-only master`
+    do
+      $EDITOR_NO_WAIT $file
+    done
+  else
+    echo "Hey man. You're not in a directory with a git repo."
+  fi
+}
+

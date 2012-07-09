@@ -21,13 +21,16 @@
   	down = !sh -c 'CURRENT=$(git symbolic-ref HEAD | sed -e s@.*/@@) \
       && (git pull --ff-only || (git fetch origin && git rebase --preserve-merges origin/$CURRENT))'
 
-  bugfix-startpoint = "!f() { if [ $# -lt 2 ]; then echo 'usage: git bugfix-startpoint <branch> <branch> ...' >&2; exit 1; fi; git merge-base --octopus --all $@;  }; f"
+    bugfix-startpoint = "!f() { if [ $# -lt 2 ]; then echo 'usage: git bugfix-startpoint <branch> <branch> ...' >&2; exit 1; fi; git merge-base --octopus --all $@;  }; f"
 
-  publish = "!f() { if [ $# -ne 1 ]; then echo 'usage: git publish <local-branch-name>' >&2; exit 1; fi; git push --set-upstream origin $1:$1; }; f"
-  unpublish = "!f() { if [ $# -ne 1 ]; then echo 'usage: git unpublish <remote-branch-name>' >&2; exit 1; fi; git push origin :$1; }; f"
+    publish = "!f() { if [ $# -ne 1 ]; then echo 'usage: git publish <local-branch-name>' >&2; exit 1; fi; git push --set-upstream origin $1:$1; }; f"
+  
+    unpublish = "!f() { if [ $# -ne 1 ]; then echo 'usage: git unpublish <remote-branch-name>' >&2; exit 1; fi; git push origin :$1; }; f"
 
-  edit-unmerged = "!f() { git ls-files --unmerged | cut -f2 | sort -u ; }; gvim `f`"
-  add-unmerged = "!f() { git ls-files --unmerged | cut -f2 | sort -u ; }; git add `f`"
+    edit-unmerged = "!f() { git ls-files --unmerged | cut -f2 | sort -u ; }; gvim `f`"
+    add-unmerged = "!f() { git ls-files --unmerged | cut -f2 | sort -u ; }; git add `f`"
+
+    diff-branch = !git diff $(git merge-base HEAD master)
 
   # Fancy logging.
     #   h = head
