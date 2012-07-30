@@ -46,6 +46,7 @@
     ra = !git r --all
     l = "!source ~/.githelpers && pretty_git_log"
     la = !git l --all
+    lol = log --pretty=oneline --abbrev-commit --graph --decorate
 
 	[diff]
 	tool = diffmerge
@@ -71,3 +72,5 @@
 [core]
         excludesfile = "/Users/orend/.gitignore"
 	editor = subl -w
+[rerere]
+	enabled = 1
