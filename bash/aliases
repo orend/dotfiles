@@ -12,6 +12,7 @@ alias b="bundle exec"
 alias vsync="bundle exec irb -r ./lib/apps/vsync_app"
 alias ..="cd .."
 alias cdas="cd ~/dev_exclusions/assistly"
+alias gti=git
 
 # greps
 grep-src() { fgrep "$1" * -r -n $2 $3 $4 $std_excludes; }
@@ -260,5 +261,12 @@ function open_all_files_changed_from_master {
   else
     echo "Hey man. You're not in a directory with a git repo."
   fi
+}
+
+function git_wtf_happened {
+    git bisect start HEAD HEAD~${2:-8};
+    git bisect run ruby $1;
+    git bisect view;
+    git bisect reset
 }
 
