@@ -48,3 +48,16 @@ PS1="\u:\w \[$EBLACK\]\$(vcprompt --format-git %b)\[$NO_COLOR\] $ "
 #R=pass through raw ansi so colors work
 #X=no termcap init
 export LESS="-EQRX"
+
+#export SSH_AGENT_PID=`pgrep -u $USER ssh-agent`
+#if [[ "$SSH_AGENT_PID" == "" ]]; then
+#  eval `ssh-agent` >/dev/null
+#else
+#  export SSH_AUTH_SOCK=`find /tmp -name agent.$(expr $SSH_AGENT_PID - 1) 2>/dev/null`
+#fi
+#if `ssh-add -l | fgrep "agent has no identities" >/dev/null`; then
+#  for key in $HOME/.ssh/*.pub; do
+#    FILE=$HOME/.ssh/`basename $key .pub`
+#    test -f $FILE 2>/dev/null && ssh-add -t 24h $FILE
+#  done
+#fi

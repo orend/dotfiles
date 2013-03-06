@@ -11,7 +11,7 @@ alias cdvs="cd ~/src/vsync"
 alias b="bundle exec"
 alias vsync="bundle exec irb -r ./lib/apps/vsync_app"
 alias ..="cd .."
-alias cdas="cd ~/dev_exclusions/assistly"
+alias cdas="cd ~/dev_exclusions/copy/assistly"
 alias gti=git
 
 # greps
@@ -268,5 +268,11 @@ function git_wtf_happened {
     git bisect run ruby $1;
     git bisect view;
     git bisect reset
+}
+
+function unit ()
+{
+    export REPORTER=spec,failtest;
+    ${2:RAILS_ENV=test} time bundle exec ruby -Ilib:test ${1}
 }
 
