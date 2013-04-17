@@ -30,7 +30,7 @@
   edit-unmerged = "!f() { git ls-files --unmerged | cut -f2 | sort -u ; }; gvim `f`"
   add-unmerged = "!f() { git ls-files --unmerged | cut -f2 | sort -u ; }; git add `f`"
 
-  diff-branch = diff master...
+  diff-branch = diff develop...
 
   chg = whatchanged -p --abbrev-commit --pretty=medium
   g = grep --line-number --color=auto
@@ -50,6 +50,7 @@
   l = "!source ~/.githelpers && pretty_git_log"
   la = !git l --all
   lol = log --pretty=oneline --abbrev-commit --graph --decorate
+  lld = !git ll develop..
 
 	[diff]
 	tool = diffmerge
@@ -77,3 +78,5 @@
 	editor = subl -w
 [rerere]
 	enabled = 1
+[push]
+	default = tracking
