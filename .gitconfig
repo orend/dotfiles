@@ -21,46 +21,46 @@
 	down = !sh -c 'CURRENT=$(git symbolic-ref HEAD | sed -e s@.*/@@) \
     && (git pull --ff-only || (git fetch origin && git rebase --preserve-merges origin/$CURRENT))'
 
-  bugfix-startpoint = "!f() { if [ $# -lt 2 ]; then echo 'usage: git bugfix-startpoint <branch> <branch> ...' >&2; exit 1; fi; git merge-base --octopus --all $@;  }; f"
+	bugfix-startpoint = "!f() { if [ $# -lt 2 ]; then echo 'usage: git bugfix-startpoint <branch> <branch> ...' >&2; exit 1; fi; git merge-base --octopus --all $@;  }; f"
 
-  publish = "!f() { if [ $# -ne 1 ]; then echo 'usage: git publish <local-branch-name>' >&2; exit 1; fi; git push --set-upstream origin $1:$1; }; f"
+	publish = "!f() { if [ $# -ne 1 ]; then echo 'usage: git publish <local-branch-name>' >&2; exit 1; fi; git push --set-upstream origin $1:$1; }; f"
 
-  unpublish = "!f() { if [ $# -ne 1 ]; then echo 'usage: git unpublish <remote-branch-name>' >&2; exit 1; fi; git push origin :$1; }; f"
+	unpublish = "!f() { if [ $# -ne 1 ]; then echo 'usage: git unpublish <remote-branch-name>' >&2; exit 1; fi; git push origin :$1; }; f"
 
-  edit-unmerged = "!f() { git ls-files --unmerged | cut -f2 | sort -u ; }; gvim `f`"
-  add-unmerged = "!f() { git ls-files --unmerged | cut -f2 | sort -u ; }; git add `f`"
+	edit-unmerged = "!f() { git ls-files --unmerged | cut -f2 | sort -u ; }; gvim `f`"
+	add-unmerged = "!f() { git ls-files --unmerged | cut -f2 | sort -u ; }; git add `f`"
 
-  diff-branch = diff develop...
+	diff-branch = diff develop...
 
-  chg = whatchanged -p --abbrev-commit --pretty=medium
-  g = grep --line-number --color=auto
+	chg = whatchanged -p --abbrev-commit --pretty=medium
+	g = grep --line-number --color=auto
 
-# Fancy logging.
-  #   h = head
-  #   hp = head with patch
-  #   r = recent commits, only current branch
-  #   ra = recent commits, all reachable refs
-  #   l = all commits, only current branch
-  #   la = all commits, all reachable refs
-  head = !git l -1
-  h = !git head
-  hp = "!source ~/.githelpers && show_git_head"
-  r = !git l -30
-  ra = !git r --all
-  l = "!source ~/.githelpers && pretty_git_log"
-  la = !git l --all
-  lol = log --pretty=oneline --abbrev-commit --graph --decorate
-  lld = !git ll develop..
+	# Fancy logging.
+	#   h = head
+	#   hp = head with patch
+	#   r = recent commits, only current branch
+	#   ra = recent commits, all reachable refs
+	#   l = all commits, only current branch
+	#   la = all commits, all reachable refs
+	head = !git l -1
+	h = !git head
+	hp = "!source ~/.githelpers && show_git_head"
+	r = !git l -30
+	ra = !git r --all
+	l = "!source ~/.githelpers && pretty_git_log"
+	la = !git l --all
+	lol = log --pretty=oneline --abbrev-commit --graph --decorate
+	lld = !git ll develop..
 
-	[diff]
+[diff]
 	tool = diffmerge
-	[merge]
+[merge]
 	 tool = diffmerge
-	[difftool "diffmerge"]
+[difftool "diffmerge"]
 	cmd = diffmerge $LOCAL $REMOTE
-	[mergetool "diffmerge"]
+[mergetool "diffmerge"]
 	 cmd = diffmerge --merge --result=$MERGED $LOCAL $BASE $REMOTE
-	[mergetool]
+[mergetool]
 	 keepBackup = false
 [branch]
 	autosetuprebase = never
@@ -74,7 +74,7 @@
 	history-view-vpane-position = 591
 	main-window-view = FileView
 [core]
-        excludesfile = "/Users/orend/.gitignore"
+    excludesfile = "/Users/orend/.gitignore"
 	editor = subl -w
 [rerere]
 	enabled = 1
