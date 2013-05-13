@@ -162,6 +162,7 @@ alias sp='./script/plugin'
 alias ss='./script/server'
 alias tl='tail -f log/*.log'
 alias ts='thin start'
+alias resque_tunnel_qa6='ssh -N -f -L 8080:localhost:5678 desk@web1.internal.deskqa6.com -i ~/.ec2/keypairs/us-east-1a_assistlyqa.pem'
 
 # TDD / BDD
 

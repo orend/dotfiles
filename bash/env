@@ -17,5 +17,5 @@ export HISTIGNORE="l:ll:pwd"
 export HISTFILESIZE=1000000000
 export HISTSIZE=1000000
 
-DIR=/Users/odobzinski/dev_exclusions/assistly
+DIR=/Users/odobzinski/dev_exclusions/copy/assistly
 export RUBYLIB="$DIR:$DIR/test:$DIR/lib"

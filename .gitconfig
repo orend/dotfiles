@@ -18,7 +18,7 @@
 	pp = !git down && git push
 	pull-ff = pull --ff-only
 
-	down = !sh -c 'CURRENT=$(git symbolic-ref HEAD | sed -e s@.*/@@) \
+	down = !sh -c 'CURRENT=$(git rev-parse --abbrev-ref HEAD) \
     && (git pull --ff-only || (git fetch origin && git rebase --preserve-merges origin/$CURRENT))'
 
 	bugfix-startpoint = "!f() { if [ $# -lt 2 ]; then echo 'usage: git bugfix-startpoint <branch> <branch> ...' >&2; exit 1; fi; git merge-base --octopus --all $@;  }; f"
