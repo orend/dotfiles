@@ -1,9 +1,9 @@
 export PATH="/bin:$PATH"
-export PATH="./bin:~/bin:~/bin:/usr/local/homebrew/bin:/usr/local/bin:/usr/local/sbin:/usr/local/mysql/bin:/usr/local/git/bin:$PATH"
+export PATH="$HOME/.rbenv/bin:./bin:~/bin:~/bin:/usr/local/homebrew/bin:/usr/local/bin:/usr/local/sbin:/usr/local/mysql/bin:/usr/local/git/bin:$PATH"
 
 # Set PATH, CDPATH, EDITOR, etc.
 
-export EDITOR="subl -w"
+export EDITOR="ec"
 export EDITOR_NO_WAIT=${EDITOR/\-w/}
 export CLICOLOR=1
 export LSCOLORS=Exfxcxdxbxegedabagacad
@@ -19,3 +19,4 @@ export HISTSIZE=1000000
 
 DIR=/Users/odobzinski/dev_exclusions/copy/assistly
 export RUBYLIB="$DIR:$DIR/test:$DIR/lib"
+eval "$(rbenv init -)"

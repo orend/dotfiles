@@ -5,13 +5,9 @@ bind '"\e[A": history-search-backward'
 bind '"\e[B": history-search-forward'
 
 # vsync and mediaport aliases
-alias cdmp="cd ~/src/mediaport"
-alias cdpbc="cd ~/src/pbc"
-alias cdvs="cd ~/src/vsync"
 alias b="bundle exec"
-alias vsync="bundle exec irb -r ./lib/apps/vsync_app"
 alias ..="cd .."
-alias cdas="cd ~/dev_exclusions/copy/assistly"
+alias cdas="cd /dev_exclusions/assistly"
 alias gti=git
 
 # greps
@@ -139,6 +135,9 @@ function ct() {
   rm -f TAGS
   etags --append --output=TAGS $*
 }
+
+# Emacs
+alias e='ec -n'
 
 # TextMate
 alias et="mate"
@@ -277,3 +276,8 @@ function unit ()
     ${2:RAILS_ENV=test} time bundle exec ruby -Ilib:test ${1}
 }
 
+hitch() {
+  command hitch "$@"
+  if [[ -s "$HOME/.hitch_export_authors" ]] ; then source "$HOME/.hitch_export_authors" ; fi
+}
+alias unhitch='hitch -u'
