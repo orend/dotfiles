@@ -64,7 +64,8 @@
 [mergetool]
 	 keepBackup = false
 [branch]
-	autosetuprebase = never
+        autosetupmerge = true
+	autosetuprebase = always
 [remote "origin"]
 	push = HEAD
 [giggle]
@@ -76,7 +77,7 @@
 	main-window-view = FileView
 [core]
     excludesfile = "/Users/orend/.gitignore"
-	editor = subl -w
+	editor = ~/bin/ec
 [rerere]
 	enabled = 1
 [push]

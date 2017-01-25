@@ -16,6 +16,9 @@ export HISTCONTROL=ignorespace:erasedups
 export HISTIGNORE="l:ll:pwd"
 export HISTFILESIZE=1000000000
 export HISTSIZE=1000000
+shopt -s histappend # append instead of rewrite
+
+export PROMPT_COMMAND="history -a" # save history after every command
 
 DIR=/Users/odobzinski/dev_exclusions/copy/assistly
 export RUBYLIB="$DIR:$DIR/test:$DIR/lib"
