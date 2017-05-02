@@ -1,5 +1,5 @@
 export PATH="/bin:$PATH"
-export PATH="$HOME/.rbenv/bin:./bin:~/bin:~/bin:/usr/local/homebrew/bin:/usr/local/bin:/usr/local/sbin:/usr/local/mysql/bin:/usr/local/git/bin:$PATH"
+export PATH="$HOME/.rbenv/bin:./bin:~/bin:~/bin:/usr/local/homebrew/bin:/usr/local/bin:/usr/local/sbin:/usr/local/mysql/bin:/usr/local/git/bin:/usr/local/homebrew/bin:$PATH"
 
 # Set PATH, CDPATH, EDITOR, etc.
 
