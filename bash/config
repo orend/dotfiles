@@ -40,7 +40,7 @@ BWHITE='\e[47m'
 
 # Update the command prompt to be <user>:<current_directory>(git_branch) >
 # Note that the git branch is given a special color
-PS1="\u:\w \[$EBLACK\]\$(vcprompt --format-git %b)\[$NO_COLOR\] $ "
+PS1="\u:\w \[$EBLACK\]\$(vcprompt -f %b)\[$NO_COLOR\] $ "
 
 # Pager config (ex., for git diff output)
 #E=quit at first EOF

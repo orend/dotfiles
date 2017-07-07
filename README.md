@@ -2,8 +2,12 @@ Installation:
 
 checkout the repository to ~/bin
 
-put the following line in your .bash_profile file
+If you don't have a ~/.bash_profile yet:
+
+cp ~/bin/dotfiles/.bash_profile ~/.bash_profile file
 
 source ~/bin/dotfiles/bashrc
 
 copy .gitconfig, .irbrc and .railsrc to ~/
+
+brew install vcprompt rbenv
