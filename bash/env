@@ -23,3 +23,6 @@ export PROMPT_COMMAND="history -a" # save history after every command
 DIR=/Users/odobzinski/dev_exclusions/copy/assistly
 export RUBYLIB="$DIR:$DIR/test:$DIR/lib"
 eval "$(rbenv init -)"
+
+export P4PORT=ssl:p4proxy.ashburn.soma.salesforce.com:1999
+export P4CLIENT=odobzinski-wsm1-blt
