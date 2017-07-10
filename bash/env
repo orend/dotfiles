@@ -26,3 +26,6 @@ eval "$(rbenv init -)"
 
 export P4PORT=ssl:p4proxy.soma.salesforce.com:1999
 export P4CLIENT=odobzinski-wsm1-blt
+
+EDITOR="emacsclient -c"
+VISUAL="emacsclient -c"
