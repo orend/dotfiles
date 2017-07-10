@@ -11,5 +11,4 @@ source ~/bin/dotfiles/bashrc
 
 copy .gitconfig, .irbrc and .railsrc to ~/
 
-brew install vcprompt rbenv cask coreutils
-brew cask install emacs
+brew bundle
