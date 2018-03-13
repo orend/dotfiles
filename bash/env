@@ -1,5 +1,5 @@
 export PATH="/bin:$PATH"
-export PATH="$HOME/bin:.rbenv/bin:/usr/local/bin:./bin:~/bin:/usr/local/homebrew/bin:/usr/local/sbin:/usr/local/mysql/bin:/usr/local/git/bin:/usr/local/homebrew/bin:$PATH"
+export PATH="$HOME/bin:.rbenv/bin:/usr/local/bin:./bin:~/bin:/usr/local/homebrew/bin:/usr/local/sbin:/usr/local/mysql/bin:/usr/local/git/bin:/usr/local/homebrew/bin:/Users/odobzinski/Library/Python/3.6/bin:$PATH"
 
 # Set PATH, CDPATH, EDITOR, etc.
 
@@ -29,3 +29,6 @@ export P4CLIENT=odobzinski-wsm1-blt
 
 EDITOR="emacsclient -c"
 VISUAL="emacsclient -c"
+
+[ -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion
+source <(stern --completion=bash)
