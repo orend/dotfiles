@@ -52,6 +52,7 @@
 	lol = log --pretty=oneline --abbrev-commit --graph --decorate
 	lld = !git ll develop..
         rec = !git for-each-ref --sort='-authordate:relative' --format='%(color:red)%(objectname:short) %(color:white)- %(color:yellow)(%(refname:short)) %(color:white)%(subject) %(color:green)(%(authordate:relative)) %(color:bold blue)<%(authorname)>' refs/heads | less -R
+        up = push -u origin HEAD
 
 [diff]
 	tool = diffmerge
