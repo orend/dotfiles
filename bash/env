@@ -1,6 +1,7 @@
 export PATH="$HOME/.rvm/bin:$HOME/bin:/usr/local/opt/postgresql@10/bin:/usr/local/bin:./bin:~/bin:/usr/local/homebrew/bin: ~/.cargo/bin/:/usr/local/sbin:/usr/local/mysql/bin:/usr/local/git/bin:/usr/local/homebrew/bin:/Users/odobzinski/Library/Python/3.6/bin:$PATH"
 
 source ~/.rvm/scripts/rvm
+source "$HOME/.sdkman/bin/sdkman-init.sh"
 
 # Set PATH, CDPATH, EDITOR, etc.
 
