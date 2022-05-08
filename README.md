@@ -6,6 +6,8 @@ If you don't have a ~/.bash_profile yet:
 
     cp ~/bin/dotfiles/.bash_profile ~/.bash_profile
     cp ~/bin/dotfiles/ec ~/bin/
+    cp ~/bin/dotfiles/emacs ~/bin/
+
 
     source ~/bin/dotfiles/bashrc
 
