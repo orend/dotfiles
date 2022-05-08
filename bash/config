@@ -61,3 +61,4 @@ export LESS="-EQRX"
 #    test -f $FILE 2>/dev/null && ssh-add -t 24h $FILE
 #  done
 #fi
+export BASH_SILENCE_DEPRECATION_WARNING=1
