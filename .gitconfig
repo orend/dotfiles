@@ -1,5 +1,5 @@
 [user]
-	email = oren@desk.com
+	email = odobzinski@salesforce.com
 	name = Oren Dobzinski
 [color]
 	status = auto
@@ -76,7 +76,7 @@
 	history-view-vpane-position = 591
 	main-window-view = FileView
 [core]
-    excludesfile = "/Users/orend/.gitignore"
+    excludesfile = "/Users/odobzinski/.gitignore"
 	editor = ~/bin/ec
 [rerere]
 	enabled = 1
