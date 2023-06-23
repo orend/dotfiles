@@ -8,6 +8,7 @@ If you don't have a ~/.bash_profile yet:
     cp ~/bin/dotfiles/ec ~/bin/
     cp ~/bin/dotfiles/emacs ~/bin/
     cp ~/bin/dotfiles/.gitconfig ~/
+    cp ~/bin/dotfiles/.gitignore ~/
 
     source ~/bin/dotfiles/bashrc
 
