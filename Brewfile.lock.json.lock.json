@@ -1,0 +1,16 @@
+{
+  "entries": {
+  },
+  "system": {
+    "macos": {
+      "ventura": {
+        "HOMEBREW_VERSION": "3.5.9",
+        "HOMEBREW_PREFIX": "/opt/homebrew",
+        "Homebrew/homebrew-core": "a6d7c257d4b9bbf76812482b503e0ad869e4d462",
+        "CLT": "14.3.0.0.1.1679647830",
+        "Xcode": "13.4.1",
+        "macOS": "13.3.1"
+      }
+    }
+  }
+}
