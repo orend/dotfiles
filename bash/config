@@ -62,3 +62,4 @@ export LESS="-EQRX"
 #  done
 #fi
 export BASH_SILENCE_DEPRECATION_WARNING=1
+eval "$(direnv hook bash)"
