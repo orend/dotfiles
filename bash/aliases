@@ -52,7 +52,7 @@ function take() {
     cd "$1"
 }
 
-alias e='exit'
+alias ex='exit'
 alias k9="killall -9"
 function killnamed () {
     ps ax | grep $1 | cut -d ' ' -f 2 | xargs kill
@@ -137,7 +137,9 @@ function ct() {
 }
 
 # Emacs
-alias e='ec -n'
+function e() {
+    /Users/aviv.dobzinski/bin/ec -n "$@"
+}
 
 # TextMate
 alias et="mate"
