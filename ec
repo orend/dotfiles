@@ -19,9 +19,9 @@ open_in_dired() {
     # Get absolute path
     local abs_dir=$(cd "$dir" && pwd)
     if [ -n "$NO_WAIT" ]; then
-        emacs --eval "(dired \"$abs_dir\")" &
+        emacs --eval "(progn (dired \"$abs_dir\") (delete-other-windows))" &
     else
-        emacs --eval "(dired \"$abs_dir\")"
+        emacs --eval "(progn (dired \"$abs_dir\") (delete-other-windows))"
     fi
 }
 
@@ -29,7 +29,8 @@ open_in_dired() {
 # If argument is a directory, use dired
 if [ $# -eq 0 ] || [ -d "$1" ]; then
     dir="${1:-.}"
-    if emacsclient $NO_WAIT -c --eval "(dired \"$dir\")" 2>/dev/null; then
+    abs_dir=$(cd "$dir" && pwd)
+    if emacsclient $NO_WAIT -c --eval "(progn (dired \"$abs_dir\") (delete-other-windows))" 2>/dev/null; then
         # emacsclient succeeded
         exit 0
     fi
