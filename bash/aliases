@@ -1,8 +1,10 @@
 # Command Enhancements
 
 # history completion - bind up key
-bind '"\e[A": history-search-backward'
-bind '"\e[B": history-search-forward'
+if [[ $- == *i* ]]; then
+  bind '"\e[A": history-search-backward'
+  bind '"\e[B": history-search-forward'
+fi
 
 # vsync and mediaport aliases
 alias b="bundle exec"

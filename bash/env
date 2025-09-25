@@ -18,7 +18,9 @@ fi
 
 export PATH="$(dedup_path "$base_paths:$PATH")"
 
-source ~/.rvm/scripts/rvm
+if [[ $- == *i* ]] && command -v ps >/dev/null 2>&1 && [[ -s "$HOME/.rvm/scripts/rvm" ]]; then
+  source "$HOME/.rvm/scripts/rvm"
+fi
 source "$HOME/.sdkman/bin/sdkman-init.sh"
 
 # Set PATH, CDPATH, EDITOR, etc.
