@@ -1,7 +1,4 @@
 tap "buo/cask-upgrade"
-tap "homebrew/bundle"
-tap "homebrew/cask"
-tap "homebrew/services"
 brew "bash-completion"
 brew "emacs", restart_service: true
 brew "cask"
