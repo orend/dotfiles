@@ -138,9 +138,21 @@ function ct() {
   etags --append --output=TAGS $*
 }
 
-# Emacs
+# Emacs - always open new window, bypass emacsclient
 function e() {
-    /Users/aviv.dobzinski/bin/ec -n "$@"
+    local dir="${1:-.}"
+    if [ -d "$dir" ]; then
+        # Open directory in dired mode with new instance
+        local abs_dir=$(cd "$dir" && pwd)
+        open -n -a Emacs --args --eval "(progn (dired \"$abs_dir\") (delete-other-windows))"
+    elif [ $# -eq 0 ]; then
+        # No arguments, open current directory with new instance
+        local abs_dir=$(pwd)
+        open -n -a Emacs --args --eval "(progn (dired \"$abs_dir\") (delete-other-windows))"
+    else
+        # Open file(s) with new instance
+        open -n -a Emacs "$@"
+    fi
 }
 
 # TextMate

@@ -10,7 +10,7 @@ dedup_path() {
   printf '%s' "$result"
 }
 
-base_paths="$HOME/.rvm/bin:$HOME/bin:/usr/local/opt/postgresql@10/bin:/usr/local/bin:./bin:~/bin:/usr/local/homebrew/bin:~/dev/flutter/bin:~/.cargo/bin/:/usr/local/sbin:/usr/local/mysql/bin:/usr/local/git/bin:/Users/odobzinski/Library/Python/3.6/bin:/opt/homebrew/bin"
+base_paths="$HOME/.rvm/bin:$HOME/bin:/usr/local/opt/postgresql@10/bin:/usr/local/bin:./bin:~/bin:/usr/local/homebrew/bin:~/dev/flutter/bin:~/.cargo/bin/:/usr/local/sbin:/usr/local/mysql/bin:/usr/local/git/bin:~/Library/Python/3.6/bin:/opt/homebrew/bin:~/.local/bin"
 
 if [ -d /opt/homebrew/opt/openjdk/bin ]; then
   base_paths="/opt/homebrew/opt/openjdk/bin:$base_paths"
