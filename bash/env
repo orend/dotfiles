@@ -57,3 +57,7 @@ source <(kubectl completion bash)
 
 export SLACK_USER=odobzinski
 export AWS_MFA_ARN=arn:aws:iam::769948485555:mfa/odobzinski
+
+# Suppress gRPC ALTS warnings (not running on GCP)
+export GRPC_VERBOSITY=ERROR
+export GRPC_TRACE=""
