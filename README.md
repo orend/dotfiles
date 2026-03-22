@@ -1,21 +1,18 @@
 Installation:
 
-checkout the repository to ~/bin
+Clone the repository to ~/bin:
 
-If you don't have a ~/.bash_profile yet:
+    git clone <repo-url> ~/bin/dotfiles
 
-    cp ~/bin/dotfiles/.bash_profile ~/.bash_profile
-    cp ~/bin/dotfiles/ec ~/bin/
-    cp ~/bin/dotfiles/emacs ~/bin/
-    cp ~/bin/dotfiles/.gitconfig ~/
-    cp ~/bin/dotfiles/.gitignore ~/
+Run the install script:
 
-    source ~/bin/dotfiles/bashrc
+    ./install.sh
 
-    brew bundle
+This will:
+- Symlink dotfiles (.bash_profile, .gitconfig, .gitignore, .githelpers, .irbrc) to ~
+- Symlink scripts (ec, emacs) to ~/bin
+- Change default shell to bash
+- Install Homebrew packages (brew bundle)
+- Install SDKMAN and RVM
 
-Install sdkman
-    \curl -s "https://get.sdkman.io" | bash
-
-Install RVM
-    \curl -sSL https://get.rvm.io | bash
+Existing files are backed up to ~/.dotfiles_backup/ before being replaced.
