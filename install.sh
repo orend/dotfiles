@@ -29,6 +29,7 @@ link_file "$DOTFILES_DIR/.gitconfig"    "$HOME/.gitconfig"
 link_file "$DOTFILES_DIR/.gitignore"    "$HOME/.gitignore"
 link_file "$DOTFILES_DIR/.githelpers"   "$HOME/.githelpers"
 link_file "$DOTFILES_DIR/.irbrc"        "$HOME/.irbrc"
+link_file "$DOTFILES_DIR/.tmux.conf"   "$HOME/.tmux.conf"
 
 # --- Symlink scripts to ~/bin ---
 echo "Symlinking scripts to ~/bin..."
@@ -36,6 +37,14 @@ mkdir -p "$HOME/bin"
 link_file "$DOTFILES_DIR/ec"    "$HOME/bin/ec"
 link_file "$DOTFILES_DIR/emacs" "$HOME/bin/emacs"
 chmod +x "$DOTFILES_DIR/ec" "$DOTFILES_DIR/emacs"
+
+# --- Install Homebrew packages ---
+echo "Installing Homebrew packages..."
+if command -v brew >/dev/null 2>&1; then
+  (cd "$DOTFILES_DIR" && brew bundle)
+else
+  echo "  Homebrew not found — skipping. Install from https://brew.sh"
+fi
 
 # --- Change default shell to bash ---
 echo "Setting default shell to bash..."
@@ -53,18 +62,10 @@ if ! grep -qx "$BASH_PATH" /etc/shells; then
 fi
 
 if [ "$SHELL" != "$BASH_PATH" ]; then
-  chsh -s "$BASH_PATH"
+  sudo dscl . -create "/Users/$(whoami)" UserShell "$BASH_PATH"
   echo "  Default shell changed to $BASH_PATH (takes effect on next login)"
 else
   echo "  Default shell is already $BASH_PATH"
-fi
-
-# --- Install Homebrew packages ---
-echo "Installing Homebrew packages..."
-if command -v brew >/dev/null 2>&1; then
-  (cd "$DOTFILES_DIR" && brew bundle)
-else
-  echo "  Homebrew not found — skipping. Install from https://brew.sh"
 fi
 
 # --- Install SDKMAN ---
@@ -72,7 +73,7 @@ echo "Installing SDKMAN..."
 if [ -d "$HOME/.sdkman" ]; then
   echo "  SDKMAN already installed"
 else
-  curl -s "https://get.sdkman.io" | bash
+  curl -s "https://get.sdkman.io" | "$BASH_PATH"
 fi
 
 # --- Install RVM ---
