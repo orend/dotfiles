@@ -1,0 +1,53 @@
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+    "CLAUDE_CODE_NEW_INIT": "true",
+    "CLAUDE_CODE_ENABLE_TELEMETRY": "1"
+  },
+  "model": "opus[1m]",
+  "enabledPlugins": {
+    "superpowers@claude-plugins-official": true,
+    "playwright@claude-plugins-official": true,
+    "jira@ai-platform": true,
+    "ecosystem@ai-platform": true,
+    "frontend-design@claude-plugins-official": true,
+    "skill-creator@claude-plugins-official": true,
+    "ralph-loop@claude-plugins-official": true,
+    "claude-md-management@claude-plugins-official": true,
+    "figma@claude-plugins-official": true,
+    "claude-code-setup@claude-plugins-official": true,
+    "atlassian@claude-plugins-official": true,
+    "explanatory-output-style@claude-plugins-official": true,
+    "github@claude-plugins-official": true,
+    "databricks-ai-dev-kit@databricks-ai-dev-kit": true
+  },
+  "extraKnownMarketplaces": {
+    "ai-platform": {
+      "source": {
+        "source": "directory",
+        "path": "/Users/oren.dobzinski/lib/ai-platform-dev-tools"
+      },
+      "autoUpdate": true
+    },
+    "databricks-ai-dev-kit": {
+      "source": {
+        "source": "github",
+        "repo": "databricks-solutions/ai-dev-kit"
+      }
+    }
+  },
+  "effortLevel": "high",
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "osascript -e 'display notification \"Claude Code needs your attention\" with title \"Claude Code\"'"
+          }
+        ]
+      }
+    ]
+  }
+}

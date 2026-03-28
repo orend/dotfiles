@@ -31,6 +31,12 @@ link_file "$DOTFILES_DIR/.githelpers"   "$HOME/.githelpers"
 link_file "$DOTFILES_DIR/.irbrc"        "$HOME/.irbrc"
 link_file "$DOTFILES_DIR/.tmux.conf"   "$HOME/.tmux.conf"
 
+# --- Symlink Claude Code config ---
+echo "Symlinking Claude Code config..."
+mkdir -p "$HOME/.claude"
+link_file "$DOTFILES_DIR/claude/settings.json" "$HOME/.claude/settings.json"
+link_file "$DOTFILES_DIR/claude/CLAUDE.md"     "$HOME/.claude/CLAUDE.md"
+
 # --- Symlink scripts to ~/bin ---
 echo "Symlinking scripts to ~/bin..."
 mkdir -p "$HOME/bin"
