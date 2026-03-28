@@ -36,6 +36,13 @@
       }
     }
   },
+  "additionalDirectories": [
+    {
+      "path": "~/lib/notes",
+      "readClaudeMd": true
+    }
+  ],
+  "cleanupPeriodDays": 100000,
   "effortLevel": "high",
   "hooks": {
     "Notification": [

@@ -33,9 +33,33 @@ link_file "$DOTFILES_DIR/.tmux.conf"   "$HOME/.tmux.conf"
 
 # --- Symlink Claude Code config ---
 echo "Symlinking Claude Code config..."
-mkdir -p "$HOME/.claude"
+mkdir -p "$HOME/.claude" "$HOME/.claude/skills" "$HOME/.claude/agents"
 link_file "$DOTFILES_DIR/claude/settings.json" "$HOME/.claude/settings.json"
 link_file "$DOTFILES_DIR/claude/CLAUDE.md"     "$HOME/.claude/CLAUDE.md"
+
+# --- Symlink Claude Code skills & agents from notes repo ---
+NOTES_DIR="$HOME/lib/notes"
+if [ -d "$NOTES_DIR/.claude/skills" ]; then
+  echo "Symlinking Claude Code skills from notes repo..."
+  for skill_dir in "$NOTES_DIR/.claude/skills"/*/; do
+    skill_name=$(basename "$skill_dir")
+    link_file "$skill_dir" "$HOME/.claude/skills/$skill_name"
+  done
+fi
+if [ -d "$NOTES_DIR/.claude/agents" ]; then
+  echo "Symlinking Claude Code agents from notes repo..."
+  for agent_file in "$NOTES_DIR/.claude/agents"/*.md; do
+    [ -f "$agent_file" ] && link_file "$agent_file" "$HOME/.claude/agents/$(basename "$agent_file")"
+  done
+fi
+
+# --- Symlink reference docs into per-project Claude memory ---
+ENCODED_NOTES=$(echo "$NOTES_DIR" | sed 's|^/||; s|/|-|g; s|\.|-|g')
+NOTES_MEMORY="$HOME/.claude/projects/-${ENCODED_NOTES}/memory"
+if [ -d "$NOTES_MEMORY" ]; then
+  echo "Symlinking reference docs into notes project memory..."
+  link_file "$NOTES_DIR/repos/claude-config-layout.md" "$NOTES_MEMORY/reference_claude_config_layout.md"
+fi
 
 # --- Symlink scripts to ~/bin ---
 echo "Symlinking scripts to ~/bin..."
