@@ -1,10 +1,46 @@
 {
+  "cleanupPeriodDays": 100000,
   "env": {
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
     "CLAUDE_CODE_NEW_INIT": "true",
     "CLAUDE_CODE_ENABLE_TELEMETRY": "1"
   },
   "model": "opus[1m]",
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "osascript -e 'display notification \"Claude Code needs your attention\" with title \"Claude Code\"'"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/bin/dotfiles/claude/hooks/extract-corrections.py"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/bin/dotfiles/claude/hooks/check-workshop-schedule.sh"
+          }
+        ]
+      }
+    ]
+  },
   "enabledPlugins": {
     "superpowers@claude-plugins-official": true,
     "playwright@claude-plugins-official": true,
@@ -19,7 +55,8 @@
     "atlassian@claude-plugins-official": true,
     "explanatory-output-style@claude-plugins-official": true,
     "github@claude-plugins-official": true,
-    "databricks-ai-dev-kit@databricks-ai-dev-kit": true
+    "databricks-ai-dev-kit@databricks-ai-dev-kit": true,
+    "skill-workshop@ai-platform": true
   },
   "extraKnownMarketplaces": {
     "ai-platform": {
@@ -36,25 +73,11 @@
       }
     }
   },
+  "effortLevel": "high",
   "additionalDirectories": [
     {
       "path": "~/lib/notes",
       "readClaudeMd": true
     }
-  ],
-  "cleanupPeriodDays": 100000,
-  "effortLevel": "high",
-  "hooks": {
-    "Notification": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "osascript -e 'display notification \"Claude Code needs your attention\" with title \"Claude Code\"'"
-          }
-        ]
-      }
-    ]
-  }
+  ]
 }
