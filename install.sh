@@ -53,6 +53,17 @@ if [ -d "$NOTES_DIR/.claude/agents" ]; then
   done
 fi
 
+# --- Symlink Claude Code skills from scribe repos ---
+for REPO in "$HOME"/lib/scribe/*/; do
+  if [ -d "$REPO/.claude/skills" ]; then
+    echo "Symlinking skills from $(basename "$REPO")..."
+    for skill_dir in "$REPO/.claude/skills"/*/; do
+      skill_name=$(basename "$skill_dir")
+      [ -e "$HOME/.claude/skills/$skill_name" ] || link_file "$skill_dir" "$HOME/.claude/skills/$skill_name"
+    done
+  fi
+done
+
 # --- Symlink reference docs into per-project Claude memory ---
 ENCODED_NOTES=$(echo "$NOTES_DIR" | sed 's|^/||; s|/|-|g; s|\.|-|g')
 NOTES_MEMORY="$HOME/.claude/projects/-${ENCODED_NOTES}/memory"

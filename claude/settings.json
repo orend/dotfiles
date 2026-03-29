@@ -88,6 +88,9 @@
       }
     ]
   },
+  "permissions": {
+    "allow": ["Bash(gh:*)"]
+  },
   "enabledPlugins": {
     "superpowers@claude-plugins-official": true,
     "playwright@claude-plugins-official": true,
@@ -132,6 +135,12 @@
     {
       "path": "~/lib/notes",
       "readClaudeMd": true
+    },
+    {
+      "path": "~/lib/scribe/ai-scribe-model"
+    },
+    {
+      "path": "~/lib/scribe/ai-scribe-rags"
     }
   ]
 }
