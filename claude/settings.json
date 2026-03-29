@@ -53,17 +53,7 @@
         ]
       }
     ],
-    "SessionStart": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash ~/bin/dotfiles/claude/hooks/check-whats-new-schedule.sh"
-          }
-        ]
-      }
-    ],
+    "SessionStart": [],
     "InstructionsLoaded": [
       {
         "matcher": "",
