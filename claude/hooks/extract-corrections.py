@@ -87,15 +87,26 @@ def main():
     except json.JSONDecodeError:
         sys.exit(0)
 
+    session_id = input_data.get('session_id', '')
     transcript_path = input_data.get('transcript_path', '')
     if not transcript_path or not Path(transcript_path).exists():
         sys.exit(0)
 
+    # Only fire once per session -- use a marker file
+    marker_dir = Path.home() / '.claude' / '.stop-hook-markers'
+    marker_dir.mkdir(parents=True, exist_ok=True)
+    marker_file = marker_dir / f'{session_id}.fired'
+    if marker_file.exists():
+        sys.exit(0)
+
     corrections = extract_corrections(transcript_path)
 
-    # Only trigger if there are meaningful corrections (3+ to avoid noise)
-    if len(corrections) < 3:
+    # Only trigger if there are meaningful corrections (5+ to avoid noise in long sessions)
+    if len(corrections) < 5:
         sys.exit(0)
+
+    # Mark as fired so we don't re-trigger
+    marker_file.touch()
 
     # Sample up to 5 corrections for the reminder
     samples = corrections[:5]

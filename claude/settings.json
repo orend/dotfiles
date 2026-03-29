@@ -7,13 +7,37 @@
   },
   "model": "opus[1m]",
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if git branch --show-current 2>/dev/null | grep -qE '^(main|master)$'; then echo 'BLOCK: Create a feature branch first. Do not commit directly to main.' >&2; exit 2; fi",
+            "if": "Bash(git commit*)"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"systemMessage\": \"A git push just happened. You MUST immediately: (1) Check if there is an open PR for this branch using gh pr view. If so, compare the PR description to the full commit history (git log main..HEAD). If the description is stale or missing recent changes, update it now using gh pr edit. (2) Check if the README needs updating. If so, update it, commit, and push. Do not ask for permission - just do it. If everything is current, say nothing.\"}'",
+            "if": "Bash(git push*)"
+          }
+        ]
+      }
+    ],
     "Notification": [
       {
         "matcher": "",
         "hooks": [
           {
             "type": "command",
-            "command": "osascript -e 'display notification \"Claude Code needs your attention\" with title \"Claude Code\"'"
+            "command": "ntfy publish claude-oren-e2ecee87 \"Claude Code needs attention in: $(basename $(pwd))\" 2>/dev/null; afplay /System/Library/Sounds/Glass.aiff 2>/dev/null &"
           }
         ]
       }
@@ -29,13 +53,36 @@
         ]
       }
     ],
-    "SessionStart": [
+    "SessionStart": [],
+    "InstructionsLoaded": [
       {
         "matcher": "",
         "hooks": [
           {
             "type": "command",
-            "command": "bash ~/bin/dotfiles/claude/hooks/check-workshop-schedule.sh"
+            "command": "python3 ~/bin/dotfiles/claude/hooks/validate-instructions.py"
+          }
+        ]
+      }
+    ],
+    "ConfigChange": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo \"$(date -u +%Y-%m-%dT%H:%M:%SZ) changed: $(cat | python3 -c \"import sys,json; d=json.load(sys.stdin); print(d.get('source','?'), d.get('file_path','?'))\" 2>/dev/null)\" >> ~/.claude/config-audit.log"
+          }
+        ]
+      }
+    ],
+    "PostCompact": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo \"---\n$(date -u +%Y-%m-%dT%H:%M:%SZ)\n$(cat | python3 -c \"import sys,json; print(json.load(sys.stdin).get('compact_summary',''))\" 2>/dev/null)\n\" >> ~/.claude/compaction-log.md"
           }
         ]
       }
@@ -56,7 +103,14 @@
     "explanatory-output-style@claude-plugins-official": true,
     "github@claude-plugins-official": true,
     "databricks-ai-dev-kit@databricks-ai-dev-kit": true,
-    "skill-workshop@ai-platform": true
+    "code-review@claude-plugins-official": true,
+    "feature-dev@claude-plugins-official": true,
+    "commit-commands@claude-plugins-official": true,
+    "agent-sdk-dev@claude-plugins-official": true,
+    "plugin-dev@claude-plugins-official": true,
+    "self-improve@ai-platform": true,
+    "context7@claude-plugins-official": true,
+    "code-simplifier@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "ai-platform": {

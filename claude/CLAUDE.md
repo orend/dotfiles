@@ -15,6 +15,7 @@ User profile and cross-project preferences are stored in `~/.claude/memory/`. Re
 - No emojis unless explicitly requested.
 - No em dashes. Use regular dashes or commas instead.
 - When drafting Slack messages: use Slack mrkdwn format (bold with `*text*`, not `**text**`).
+- No markdown tables in Slack messages -- they render as plain text. Use bullet lists instead.
 - When drafting text for the user to copy-paste, save it to `~/Downloads/` as a text file.
 
 ## Skills & Config Layout
