@@ -3,7 +3,6 @@
 # Connect to OpenClaw on Mac Mini: ensure gateway is running, tunnel, open dashboard
 
 REMOTE_HOST="oren@192.168.1.13"
-REMOTE_OPENCLAW="/opt/homebrew/bin/openclaw"
 PORT=18789
 SESSION="openclaw"
 
@@ -17,8 +16,8 @@ fi
 # Ensure gateway is running on Mac Mini
 echo "Checking gateway on Mac Mini..."
 if ! ssh -o ConnectTimeout=5 "$REMOTE_HOST" "export PATH=/opt/homebrew/bin:\$PATH; openclaw health" &>/dev/null; then
-  echo "Gateway is down. Starting it in tmux on Mac Mini..."
-  ssh -o ConnectTimeout=5 "$REMOTE_HOST" "export PATH=/opt/homebrew/bin:\$PATH; tmux kill-session -t openclaw 2>/dev/null; tmux new-session -d -s openclaw '$REMOTE_OPENCLAW gateway --port $PORT'"
+  echo "Gateway is down. Starting via LaunchAgent..."
+  ssh -o ConnectTimeout=5 "$REMOTE_HOST" "export PATH=/opt/homebrew/bin:\$PATH; openclaw gateway start"
   sleep 3
 
   if ! ssh -o ConnectTimeout=5 "$REMOTE_HOST" "export PATH=/opt/homebrew/bin:\$PATH; openclaw health" &>/dev/null; then
@@ -28,10 +27,10 @@ if ! ssh -o ConnectTimeout=5 "$REMOTE_HOST" "export PATH=/opt/homebrew/bin:\$PAT
 fi
 echo "Gateway is running."
 
-# Get dashboard token
-TOKEN=$(ssh -o ConnectTimeout=5 "$REMOTE_HOST" "export PATH=/opt/homebrew/bin:\$PATH; openclaw dashboard 2>&1" | grep -o 'token=[a-f0-9]*' | head -1 | cut -d= -f2)
+# Get dashboard token from config
+TOKEN=$(ssh -o ConnectTimeout=5 "$REMOTE_HOST" "jq -r '.gateway.auth.token' ~/.openclaw/openclaw.json")
 
-if [ -z "$TOKEN" ]; then
+if [ -z "$TOKEN" ] || [ "$TOKEN" = "null" ]; then
   echo "Could not get dashboard token. Opening without token."
 fi
 
@@ -45,7 +44,7 @@ echo "Tunnel open in tmux session '$SESSION'"
 echo "  tmux attach -t $SESSION   # to inspect"
 echo "  tmux kill-session -t $SESSION   # to stop"
 
-if [ -n "$TOKEN" ]; then
+if [ -n "$TOKEN" ] && [ "$TOKEN" != "null" ]; then
   open "http://localhost:${PORT}/#token=${TOKEN}"
 else
   open "http://localhost:${PORT}/"
