@@ -302,3 +302,7 @@ alias unhitch='hitch -u'
 tai() {
   command tai "$@" 2> >(grep -v "ALTS creds ignored" | grep -v "absl::InitializeLog" >&2)
 }
+
+# OpenClaw
+alias openclaw-stop='tmux kill-session -t openclaw'
+alias openclaw-status='tmux has-session -t openclaw 2>/dev/null && echo "running" || echo "not running"'
