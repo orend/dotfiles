@@ -46,9 +46,10 @@ Do NOT use mrkdwn syntax (*, `, >) - it won't render from pasted text.
 
 1. Identify what the user wants to communicate
 2. Draft the message
-3. Convert to HTML
-4. Copy to clipboard using the hexdump/osascript approach above
-5. Tell the user "Copied to clipboard - paste into Slack"
+3. Show a preview to the user using Slack mrkdwn formatting (bold with *text*, bullet lists)
+4. Convert to HTML
+5. Copy to clipboard using the hexdump/osascript approach above
+6. Tell the user "Copied to clipboard - paste into Slack"
 
 ## Examples
 
