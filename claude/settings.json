@@ -15,6 +15,11 @@
             "type": "command",
             "command": "if git branch --show-current 2>/dev/null | grep -qE '^(main|master)$'; then echo 'BLOCK: Create a feature branch first. Do not commit directly to main.' >&2; exit 2; fi",
             "if": "Bash(git commit*)"
+          },
+          {
+            "type": "command",
+            "command": "bash ~/bin/dotfiles/claude/hooks/check-pr-before-push.sh 2>/dev/null || true",
+            "if": "Bash(git push*)"
           }
         ]
       }
