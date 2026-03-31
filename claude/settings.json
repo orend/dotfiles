@@ -5,6 +5,57 @@
     "CLAUDE_CODE_NEW_INIT": "true",
     "CLAUDE_CODE_ENABLE_TELEMETRY": "1"
   },
+  "permissions": {
+    "allow": [
+      "Read",
+      "Edit",
+      "Write",
+      "Glob",
+      "Grep",
+      "Agent(*)",
+      "WebSearch",
+      "WebFetch(*)",
+      "Skill(update-config)",
+      "Bash(git *)",
+      "Bash(gh:*)",
+      "Bash(gh pr view *)",
+      "Bash(gh pr list *)",
+      "Bash(gh pr diff *)",
+      "Bash(gh issue *)",
+      "Bash(gh api *)",
+      "Bash(databricks *)",
+      "Bash(curl *)",
+      "Bash(jq *)",
+      "Bash(pip *)",
+      "Bash(brew *)",
+      "Bash(npm *)",
+      "Bash(ntfy *)",
+      "Bash(claude *)",
+      "Bash(python3:*)",
+      "Bash(grep:*)",
+      "Bash(wc:*)",
+      "Bash(ls:*)",
+      "Bash(chmod:*)",
+      "Bash(pbcopy)",
+      "Bash(env)",
+      "Bash(source *)",
+      "Bash(acli jira:*)",
+      "Bash(~/bin/slack-clip:*)",
+      "Bash(osascript -)",
+      "mcp__plugin_playwright_playwright__browser_navigate",
+      "mcp__plugin_playwright_playwright__browser_take_screenshot",
+      "mcp__plugin_playwright_playwright__browser_install",
+      "mcp__plugin_databricks-ai-dev-kit_databricks__manage_workspace",
+      "mcp__plugin_databricks-ai-dev-kit_databricks__execute_sql",
+      "mcp__plugin_databricks-ai-dev-kit_databricks__get_table_details",
+      "mcp__plugin_databricks-ai-dev-kit_databricks__get_vs_index",
+      "mcp__plugin_databricks-ai-dev-kit_databricks__get_vs_endpoint",
+      "mcp__plugin_databricks-ai-dev-kit_databricks__manage_job_runs",
+      "mcp__plugin_context7_context7__resolve-library-id",
+      "mcp__plugin_context7_context7__query-docs"
+    ],
+    "defaultMode": "default"
+  },
   "model": "opus[1m]",
   "hooks": {
     "PreToolUse": [
@@ -13,7 +64,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "if git branch --show-current 2>/dev/null | grep -qE '^(main|master)$'; then echo 'BLOCK: Create a feature branch first. Do not commit directly to main.' >&2; exit 2; fi",
+            "command": "if [ \"$(git rev-parse --show-toplevel 2>/dev/null)\" = \"$HOME/lib/notes\" ]; then exit 0; fi; if git branch --show-current 2>/dev/null | grep -qE '^(main|master)$'; then echo 'BLOCK: Create a feature branch first. Do not commit directly to main.' >&2; exit 2; fi",
             "if": "Bash(git commit*)"
           },
           {
@@ -58,7 +109,17 @@
         ]
       }
     ],
-    "SessionStart": [],
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/bin/dotfiles/claude/hooks/check-workshop-schedule.sh"
+          }
+        ]
+      }
+    ],
     "InstructionsLoaded": [
       {
         "matcher": "",
@@ -93,9 +154,6 @@
       }
     ]
   },
-  "permissions": {
-    "allow": ["Bash(gh:*)"]
-  },
   "enabledPlugins": {
     "superpowers@claude-plugins-official": true,
     "playwright@claude-plugins-official": true,
@@ -105,10 +163,9 @@
     "skill-creator@claude-plugins-official": true,
     "ralph-loop@claude-plugins-official": true,
     "claude-md-management@claude-plugins-official": true,
-    "figma@claude-plugins-official": true,
     "claude-code-setup@claude-plugins-official": true,
     "atlassian@claude-plugins-official": true,
-    "explanatory-output-style@claude-plugins-official": true,
+    "explanatory-output-style@claude-plugins-official": false,
     "github@claude-plugins-official": true,
     "databricks-ai-dev-kit@databricks-ai-dev-kit": true,
     "code-review@claude-plugins-official": true,
@@ -132,7 +189,8 @@
       "source": {
         "source": "github",
         "repo": "databricks-solutions/ai-dev-kit"
-      }
+      },
+      "autoUpdate": true
     }
   },
   "effortLevel": "high",
@@ -146,6 +204,15 @@
     },
     {
       "path": "~/lib/scribe/ai-scribe-rags"
+    },
+    {
+      "path": "~/lib/scribe/ai-iac-model-serving"
+    },
+    {
+      "path": "~/lib/scribe/ai-scribe-training-data"
+    },
+    {
+      "path": "~/lib/scribe/ai-scribe-evals"
     }
   ]
 }

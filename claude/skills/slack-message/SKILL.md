@@ -24,9 +24,20 @@ Draft a concise Slack message and copy it to the clipboard with rich text format
 Always use this approach to copy to clipboard. It puts HTML on the macOS clipboard,
 which Slack renders as formatted text when pasted.
 
+IMPORTANT: You MUST set `dangerouslyDisableSandbox: true` on the Bash call because
+osascript needs system UI access which the sandbox blocks.
+
+Write the HTML to a temp file first, then call slack-clip with the file path.
+This keeps the command string stable so the user only approves once.
+
 ```bash
-HTML='<your html here>'
-echo "$HTML" | hexdump -ve '1/1 "%.2x"' | xargs printf "set the clipboard to {text:\" \", «class HTML»:«data HTML%s»}" | osascript -
+# Step 1: Write HTML to temp file (sandboxed, no approval needed)
+cat > /tmp/slack-msg.html << 'SLACKEOF'
+<your html here>
+SLACKEOF
+
+# Step 2: Copy to clipboard (needs dangerouslyDisableSandbox: true)
+~/bin/slack-clip /tmp/slack-msg.html
 ```
 
 ### HTML formatting for Slack
