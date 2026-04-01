@@ -37,21 +37,30 @@ mkdir -p "$HOME/.claude" "$HOME/.claude/skills" "$HOME/.claude/agents"
 link_file "$DOTFILES_DIR/claude/settings.json" "$HOME/.claude/settings.json"
 link_file "$DOTFILES_DIR/claude/CLAUDE.md"     "$HOME/.claude/CLAUDE.md"
 
-# --- Symlink Claude Code skills & agents from notes repo ---
+# --- Symlink Claude Code skills & agents from dotfiles ---
+shopt -s nullglob
+for skill_dir in "$DOTFILES_DIR/claude/skills"/*/; do
+  link_file "$skill_dir" "$HOME/.claude/skills/$(basename "$skill_dir")"
+done
+for agent_file in "$DOTFILES_DIR/claude/agents"/*.md; do
+  link_file "$agent_file" "$HOME/.claude/agents/$(basename "$agent_file")"
+done
+
+# --- Symlink Claude Code skills & agents from notes repo (overrides dotfiles) ---
 NOTES_DIR="$HOME/lib/notes"
 if [ -d "$NOTES_DIR/.claude/skills" ]; then
   echo "Symlinking Claude Code skills from notes repo..."
   for skill_dir in "$NOTES_DIR/.claude/skills"/*/; do
-    skill_name=$(basename "$skill_dir")
-    link_file "$skill_dir" "$HOME/.claude/skills/$skill_name"
+    link_file "$skill_dir" "$HOME/.claude/skills/$(basename "$skill_dir")"
   done
 fi
 if [ -d "$NOTES_DIR/.claude/agents" ]; then
   echo "Symlinking Claude Code agents from notes repo..."
   for agent_file in "$NOTES_DIR/.claude/agents"/*.md; do
-    [ -f "$agent_file" ] && link_file "$agent_file" "$HOME/.claude/agents/$(basename "$agent_file")"
+    link_file "$agent_file" "$HOME/.claude/agents/$(basename "$agent_file")"
   done
 fi
+shopt -u nullglob
 
 # --- Symlink Claude Code skills from scribe repos ---
 for REPO in "$HOME"/lib/scribe/*/; do
