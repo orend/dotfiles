@@ -18,6 +18,12 @@ User profile and cross-project preferences are stored in `~/.claude/memory/`. Re
 - No markdown tables in Slack messages -- they render as plain text. Use bullet lists instead.
 - When drafting text for the user to copy-paste, save it to `~/Downloads/` as a text file.
 
+## Databricks
+
+- Default Databricks profile: `modmed-mmic` (alias `mmic`). Always use `--profile mmic` or `--profile modmed-mmic` for CLI commands.
+- Default SQL warehouse: Starter Warehouse (`b23748aff560f5b8`).
+- When using the Databricks AI Dev Kit MCP tools, the profile is managed by the MCP server config - no flag needed.
+
 ## Skills & Config Layout
 
 - Personal skills live in `~/lib/notes/.claude/skills/` and are symlinked to `~/.claude/skills/` for global availability.
