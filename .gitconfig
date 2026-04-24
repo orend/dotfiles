@@ -82,3 +82,11 @@
 	enabled = 1
 [push]
 	default = tracking
+
+# Transparently rewrite HTTPS clones of modmed repos to use the github-work
+# SSH alias. Lets tools that hardcode https://github.com/modmed/... (e.g.
+# Claude Code's /plugin marketplace add, some CI scripts) work without a
+# separate HTTPS PAT — git substitutes the URL before reaching the network.
+# Scoped to modmed/* only so public github.com HTTPS clones are unaffected.
+[url "git@github-work:modmed/"]
+	insteadOf = https://github.com/modmed/
