@@ -29,4 +29,25 @@ User profile and cross-project preferences are stored in `~/.claude/memory/`. Re
 - Personal skills live in `~/lib/notes/.claude/skills/` and are symlinked to `~/.claude/skills/` for global availability.
 - When creating a new personal skill: create in the notes repo first, then symlink.
 - Global config (this file, settings.json) lives in `~/bin/dotfiles/claude/` and is symlinked to `~/.claude/`.
+- Slash commands: source in `~/bin/dotfiles/claude/commands/`, symlinked to `~/.claude/commands/`. New user commands require a fresh Claude Code session (not picked up by `/reload-plugins`).
 - See `~/lib/notes/repos/claude-config-layout.md` for the full layout.
+
+## Running Claude Code (Warp workaround)
+
+Warp has a 50k-line per-block cap (see [warpdotdev/Warp#8089](https://github.com/warpdotdev/Warp/issues/8089)) that truncates long Claude sessions. The `cc` function in `~/bin/dotfiles/bash/aliases` wraps Claude Code in tmux to sidestep it. Per-project tmux session named after `$(basename "$PWD")`.
+
+| Command | Behavior |
+|---|---|
+| `cc` | Attach to this directory's tmux+claude, or create fresh if none |
+| `cc --resume` | Same, plus open Claude's session picker on fresh creation (or if tmux is at a shell prompt) |
+| `cc --continue` | Same, but auto-resume the most recent session |
+| `cc-stop` | Kill this directory's tmux session (Claude's transcript is preserved on disk either way) |
+| `cc-status` | `running` / `not running` for the current directory |
+
+The function handles three cases: no session → create fresh; session exists with shell prompt → inject the claude command then attach; session exists with claude already running → just attach, don't clobber.
+
+**Persistence:**
+- Warp restart / tab close: tmux survives, Claude still running; `cc` reattaches transparently.
+- Machine reboot: tmux dies. Resume via `cc --continue` (latest) or `cc --resume` (picker). Claude's JSONL transcripts at `~/.claude/projects/<project-path>/<session-uuid>.jsonl` are the durable state — tmux just smooths the "between turns" gap across Warp restarts.
+
+Tmux scrollback inside the pane: `Ctrl-b [` enters copy-mode, arrows / PgUp / `/` to search, `q` exits. History limit is 1,000,000 lines (`~/bin/dotfiles/.tmux.conf`).

@@ -7,7 +7,8 @@
     "CLAUDE_CODE_PLAN_V2_AGENT_COUNT": "3",
     "CLAUDE_CODE_PLAN_V2_EXPLORE_AGENT_COUNT": "5",
     "CLAUDE_CODE_PLAN_MODE_INTERVIEW_PHASE": "false",
-    "CLAUDE_CODE_UNATTENDED_RETRY": "1"
+    "CLAUDE_CODE_UNATTENDED_RETRY": "1",
+    "DATABRICKS_CONFIG_PROFILE": "mmic"
   },
   "permissions": {
     "allow": [
@@ -87,11 +88,6 @@
             "type": "command",
             "command": "echo '{\"systemMessage\": \"A git push just happened. You MUST immediately: (1) Check if there is an open PR for this branch using gh pr view. If so, compare the PR description to the full commit history (git log main..HEAD). If the description is stale or missing recent changes, update it now using gh pr edit. (2) Check if the README needs updating. If so, update it, commit, and push. Do not ask for permission - just do it. If everything is current, say nothing.\"}'",
             "if": "Bash(git push*)"
-          },
-          {
-            "type": "command",
-            "command": "OUTPUT=$(cat); if echo \"$OUTPUT\" | grep -q 'Token expired'; then echo '{\"systemMessage\": \"Jira auth token has expired. Do NOT retry the command. Instead, tell the user to run: ! acli jira auth login --web\"}'; fi",
-            "if": "Bash(acli jira*)"
           }
         ]
       }
@@ -125,6 +121,12 @@
           {
             "type": "command",
             "command": "bash ~/bin/dotfiles/claude/hooks/check-workshop-schedule.sh"
+          },
+          {
+            "type": "mcp_tool",
+            "server": "plugin_databricks-ai-dev-kit_databricks",
+            "tool": "manage_workspace",
+            "input": { "action": "switch", "profile": "mmic" }
           }
         ]
       }
@@ -165,7 +167,6 @@
   },
   "enabledPlugins": {
     "superpowers@claude-plugins-official": true,
-    "playwright@claude-plugins-official": true,
     "jira@ai-platform": true,
     "ecosystem@ai-platform": true,
     "frontend-design@claude-plugins-official": true,
@@ -173,8 +174,7 @@
     "ralph-loop@claude-plugins-official": true,
     "claude-md-management@claude-plugins-official": true,
     "claude-code-setup@claude-plugins-official": true,
-    "explanatory-output-style@claude-plugins-official": false,
-    "github@claude-plugins-official": true,
+    "explanatory-output-style@claude-plugins-official": true,
     "databricks-ai-dev-kit@databricks-ai-dev-kit": true,
     "code-review@claude-plugins-official": true,
     "feature-dev@claude-plugins-official": true,
@@ -184,7 +184,10 @@
     "self-improve@ai-platform": true,
     "context7@claude-plugins-official": true,
     "code-simplifier@claude-plugins-official": true,
-    "ema-query@ai-platform": true
+    "ema-query@ai-platform": true,
+    "hookify@claude-plugins-official": true,
+    "learning-output-style@claude-plugins-official": true,
+    "warp@claude-code-warp": true
   },
   "extraKnownMarketplaces": {
     "ai-platform": {
@@ -200,9 +203,15 @@
         "repo": "databricks-solutions/ai-dev-kit"
       },
       "autoUpdate": true
+    },
+    "claude-code-warp": {
+      "source": {
+        "source": "github",
+        "repo": "warpdotdev/claude-code-warp"
+      },
+      "autoUpdate": true
     }
   },
-  "effortLevel": "high",
   "skipAutoPermissionPrompt": true,
   "additionalDirectories": [
     {

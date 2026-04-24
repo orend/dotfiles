@@ -306,3 +306,43 @@ tai() {
 # OpenClaw
 alias openclaw-stop='tmux kill-session -t openclaw'
 alias openclaw-status='tmux has-session -t openclaw 2>/dev/null && echo "running" || echo "not running"'
+
+# Claude Code — wrap in tmux so Warp's 50k-line block cap doesn't truncate
+# history (see warpdotdev/Warp#8089). Session name = basename of PWD.
+#
+# Three cases:
+#   1. No tmux session for this dir: create fresh, run `claude [args]`.
+#   2. Session exists, active pane at shell prompt (claude exited or never
+#      started): inject `claude [args]` into the pane, then attach.
+#   3. Session exists, something else running in the active pane (claude
+#      already in flight, vim, etc.): just attach — leave it alone.
+#
+# `cc --resume` / `cc --continue` therefore work in cases 1 and 2 without
+# needing to cc-stop first. Case 3 protects running sessions from being
+# clobbered; restart manually with `cc-stop && cc --resume` if you really
+# want a fresh claude on top of an existing tmux.
+cc() {
+    local name current cmd arg
+    name="$(basename "$PWD")"
+    if tmux has-session -t "$name" 2>/dev/null; then
+        current=$(tmux display-message -p -t "$name" -F "#{pane_current_command}" 2>/dev/null)
+        case "$current" in
+            bash|zsh|sh|fish|dash)
+                cmd="claude"
+                for arg in "$@"; do
+                    cmd+=" $(printf '%q' "$arg")"
+                done
+                tmux send-keys -t "$name" "$cmd" C-m
+                ;;
+        esac
+        if [ -n "$TMUX" ]; then
+            tmux switch-client -t "$name"
+        else
+            tmux attach-session -t "$name"
+        fi
+    else
+        tmux new-session -s "$name" claude "$@"
+    fi
+}
+alias cc-stop='tmux kill-session -t "$(basename "$PWD")"'
+alias cc-status='tmux has-session -t "$(basename "$PWD")" 2>/dev/null && echo "running" || echo "not running"'
