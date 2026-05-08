@@ -27,17 +27,30 @@ which Slack renders as formatted text when pasted.
 IMPORTANT: You MUST set `dangerouslyDisableSandbox: true` on the Bash call because
 osascript needs system UI access which the sandbox blocks.
 
-Write the HTML to a temp file first, then call slack-clip with the file path.
-This keeps the command string stable so the user only approves once.
+Write the HTML to a timestamped temp file first, then call slack-clip with the file path.
+Use a timestamp suffix so successive messages don't overwrite each other.
 
 ```bash
-# Step 1: Write HTML to temp file (sandboxed, no approval needed)
-cat > /tmp/slack-msg.html << 'SLACKEOF'
+# Step 1: Write HTML to timestamped temp file (sandboxed, no approval needed)
+cat > /tmp/slack-msg-$(date +%H%M%S).html << 'SLACKEOF'
 <your html here>
 SLACKEOF
 
 # Step 2: Copy to clipboard (needs dangerouslyDisableSandbox: true)
-~/bin/slack-clip /tmp/slack-msg.html
+~/bin/slack-clip /tmp/slack-msg-$(date +%H%M%S).html
+```
+
+**Important:** capture the filename in a variable so both steps use the same path:
+
+```bash
+# Step 1:
+SLACK_FILE="/tmp/slack-msg-$(date +%H%M%S).html"
+cat > "$SLACK_FILE" << 'SLACKEOF'
+<your html here>
+SLACKEOF
+
+# Step 2: (needs dangerouslyDisableSandbox: true)
+~/bin/slack-clip "$SLACK_FILE"
 ```
 
 ### HTML formatting for Slack
@@ -88,3 +101,27 @@ When the user asks for a review request or says "request review":
 3. For each PR: URL as link, summary in blockquote with code formatting where appropriate
 4. Copy to clipboard using the HTML approach
 5. Tell the user "Copied to clipboard - paste into Slack"
+
+## Posting directly via Slack MCP
+
+When the user asks to **post to a channel or DM** (not just copy to clipboard), use the `slack_send_message` MCP tool with **mrkdwn formatting** — NOT the HTML clipboard approach.
+
+**Critical mrkdwn rules for `slack_send_message`:**
+- Blockquote: `>text` on its own line (never use `&gt;` — that is an HTML entity and will render literally)
+- Inline code: `` `text` `` (backticks)
+- Bold: `*text*`
+- Links: plain URL — Slack auto-links (no `<a href>` tags)
+- Line breaks: actual `\n` in the string
+
+**Review request format for direct posting:**
+```
+please review: https://github.com/modmed/org/pull/N
+>Summary sentence. Second sentence if needed.
+```
+
+The `>` must be at the start of a new line with no space before it. Example call:
+```
+slack_send_message(channel_id=..., message="please review: https://...\n>Summary here.")
+```
+
+Always show a preview before posting and confirm the channel/recipient.

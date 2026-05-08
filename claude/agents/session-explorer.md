@@ -1,5 +1,8 @@
 ---
 name: session-explorer
+maxTurns: 25
+effort: high
+disallowedTools: [Edit, Write, NotebookEdit]
 description: "Use this agent when the user wants to analyze their recent Claude Code sessions to find improvement opportunities, discover automation candidates, identify repetitive patterns, or generate new skill ideas. This agent proactively mines session history for insights.\\n\\nExamples:\\n\\n- user: \"What have I been working on lately?\"\\n  assistant: \"Let me use the session-explorer agent to analyze your recent sessions and surface insights.\"\\n  (Since the user is asking about their recent work, use the Agent tool to launch the session-explorer agent to analyze session history.)\\n\\n- user: \"Are there any repetitive tasks I should automate?\"\\n  assistant: \"I'll launch the session-explorer agent to mine your sessions for automation candidates.\"\\n  (Since the user wants to find automation opportunities, use the Agent tool to launch the session-explorer agent.)\\n\\n- user: \"/skill-workshop\"\\n  assistant: \"Let me use the session-explorer agent to explore your sessions and find skill candidates.\"\\n  (Since the user invoked the skill workshop command, use the Agent tool to launch the session-explorer agent to discover new skill opportunities.)\\n\\n- user: \"How can I improve my workflow?\"\\n  assistant: \"I'll use the session-explorer agent to analyze your sessions and suggest workflow improvements.\"\\n  (Since the user is asking about workflow improvements, use the Agent tool to launch the session-explorer agent.)"
 model: opus
 color: orange

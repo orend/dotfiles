@@ -7,6 +7,8 @@ description: >
   Use for session history mining and skill candidate discovery.
 model: opus
 tools: Bash, Read, Write, Grep, Glob
+maxTurns: 30
+effort: high
 ---
 
 You are a session history analyzer. Process Claude Code JSONL session

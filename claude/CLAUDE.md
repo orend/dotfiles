@@ -6,8 +6,8 @@ User profile and cross-project preferences are stored in `~/.claude/memory/`. Re
 
 ## Git Rules
 
-- Always create a new branch before committing. Never commit directly to main/master. Exception: the notes repo (`~/lib/notes`) where committing to master is fine.
-- When asked to "commit and push" or create a PR, create a feature branch first (except in notes repo).
+- Always create a new branch before committing. Never commit directly to main/master. Exceptions: `~/lib/notes` and `~/bin/dotfiles` (personal repos where committing and pushing to master is fine).
+- When asked to "commit and push" or create a PR, create a feature branch first (except in `~/lib/notes` and `~/bin/dotfiles`).
 - Before creating a branch or pushing, always `git fetch origin main && git rebase origin/main` to ensure the branch is current. Resolve conflicts before proceeding.
 
 ## Writing Style

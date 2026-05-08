@@ -74,13 +74,22 @@
         "hooks": [
           {
             "type": "command",
-            "command": "if [ \"$(git rev-parse --show-toplevel 2>/dev/null)\" = \"$HOME/lib/notes\" ]; then exit 0; fi; if git branch --show-current 2>/dev/null | grep -qE '^(main|master)$'; then echo 'BLOCK: Create a feature branch first. Do not commit directly to main.' >&2; exit 2; fi",
+            "command": "case \"$(git rev-parse --show-toplevel 2>/dev/null)\" in \"$HOME/lib/notes\"|\"$HOME/bin/dotfiles\") exit 0;; esac; if git branch --show-current 2>/dev/null | grep -qE '^(main|master)$'; then echo 'BLOCK: Create a feature branch first. Do not commit directly to main.' >&2; exit 2; fi",
             "if": "Bash(git commit*)"
           },
           {
             "type": "command",
             "command": "bash ~/bin/dotfiles/claude/hooks/check-pr-before-push.sh 2>/dev/null || true",
             "if": "Bash(git push*)"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__plugin_databricks-ai-dev-kit_databricks__manage_cluster",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -c \"import sys,json; d=json.load(sys.stdin); a=d.get('tool_input',{}).get('action',''); sys.exit(0) if a != 'start' else (print(json.dumps({'decision':'block','reason':'Cluster start costs money. Ask the user to confirm before starting a cluster.'})), sys.exit(0))\""
           }
         ]
       }
@@ -98,6 +107,24 @@
             "type": "command",
             "command": "OUTPUT=$(cat); if echo \"$OUTPUT\" | grep -q 'Token expired'; then echo '{\"systemMessage\": \"Jira auth token has expired. Do NOT retry the command. Instead, tell the user to run: ! acli jira auth login --web\"}'; fi",
             "if": "Bash(acli jira*)"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__plugin_databricks-ai-dev-kit_databricks__execute_sql",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/bin/dotfiles/claude/hooks/truncate-sql-output.py"
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/bin/dotfiles/claude/hooks/log-slow-tools.py"
           }
         ]
       }
@@ -120,6 +147,21 @@
           {
             "type": "command",
             "command": "python3 ~/bin/dotfiles/claude/hooks/extract-corrections.py"
+          },
+          {
+            "type": "command",
+            "command": "bash ~/bin/dotfiles/claude/hooks/notify-stop.sh"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/bin/dotfiles/claude/hooks/restore-session-name.sh"
           }
         ]
       }
@@ -131,6 +173,15 @@
           {
             "type": "command",
             "command": "bash ~/bin/dotfiles/claude/hooks/check-workshop-schedule.sh"
+          },
+          {
+            "type": "mcp_tool",
+            "server": "plugin_databricks-ai-dev-kit_databricks",
+            "tool": "manage_workspace",
+            "input": {
+              "action": "switch",
+              "profile": "mmic"
+            }
           }
         ]
       }
@@ -203,7 +254,9 @@
     "hookify@claude-plugins-official": true,
     "learning-output-style@claude-plugins-official": true,
     "pr-review-toolkit@claude-code-plugins": true,
-    "ema-query@ai-platform": true
+    "ema-query@ai-platform": true,
+    "warp@claude-code-warp": true,
+    "slack@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "ai-platform": {
@@ -219,10 +272,22 @@
         "repo": "databricks-solutions/ai-dev-kit"
       },
       "autoUpdate": true
+    },
+    "claude-code-warp": {
+      "source": {
+        "source": "github",
+        "repo": "warpdotdev/claude-code-warp"
+      },
+      "autoUpdate": false
     }
   },
-  "effortLevel": "high",
+  "effortLevel": "medium",
   "skipAutoPermissionPrompt": true,
+  "mcpServers": {
+    "plugin_databricks-ai-dev-kit_databricks": {
+      "alwaysLoad": true
+    }
+  },
   "additionalDirectories": [
     {
       "path": "~/lib/notes",

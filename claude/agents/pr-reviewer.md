@@ -6,6 +6,8 @@ description: >
   Use when a PR is ready for review or when asked to review changes.
 model: sonnet
 tools: Bash, Read, Grep, Glob
+maxTurns: 20
+disallowedTools: [Edit, Write, NotebookEdit]
 ---
 
 You are a PR reviewer. Review the PR thoroughly and report issues by
