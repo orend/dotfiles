@@ -1,15 +1,10 @@
 ---
 name: slack-message
 description: >
-  Draft a Slack message and copy it to the macOS clipboard as rich-text HTML
-  for pasting into Slack. Use when user says "slack message", "draft slack
-  message", "copy this for slack", or wants a paste-ready message with
-  formatting preserved.
-
-  For direct posting to a channel/DM via the Slack MCP, use the plugin's
-  slack:slack-messaging skill and the slack_send_message tool instead - that
-  path takes standard markdown and posts without leaving Claude. This skill
-  is only for the HTML clipboard paste workflow.
+  Copy a paste-ready Slack message to the macOS clipboard as rich-text HTML.
+  Use when user says "slack message", "draft slack message", or wants
+  formatting preserved on paste. For direct posting to a channel/DM, the
+  plugin's slack:slack-messaging skill owns that path instead.
 user-invocable: true
 ---
 
