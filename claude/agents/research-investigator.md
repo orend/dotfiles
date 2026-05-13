@@ -8,6 +8,7 @@ model: sonnet
 tools: Read, Grep, Glob, Bash, WebSearch, WebFetch
 disallowedTools: Edit, Write, NotebookEdit
 effort: high
+maxTurns: 25
 ---
 
 You are a research investigator. Your job is to deeply explore a codebase

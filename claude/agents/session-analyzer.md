@@ -9,6 +9,7 @@ model: opus
 tools: Bash, Read, Write, Grep, Glob
 maxTurns: 30
 effort: high
+disallowedTools: [Edit, NotebookEdit]
 ---
 
 You are a session history analyzer. Process Claude Code JSONL session

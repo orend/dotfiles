@@ -169,6 +169,10 @@
             "command": "bash ~/bin/dotfiles/claude/hooks/check-workshop-schedule.sh"
           },
           {
+            "type": "command",
+            "command": "bash ~/bin/dotfiles/claude/hooks/cleanup-worktree-skills.sh"
+          },
+          {
             "type": "mcp_tool",
             "server": "plugin_databricks-ai-dev-kit_databricks",
             "tool": "manage_workspace",
