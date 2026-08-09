@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Three ways to do SSE streaming in Hono</title>
+<style>
+:root {
+  --bg: #fafaf7; --surface: #fff; --ink: #1a1a1f; --ink-soft: #555560;
+  --rule: #e7e5df; --accent: #8b5cf6; --ok: #15803d; --warn: #d97706; --danger: #b91c1c;
+  --serif: Charter, "Iowan Old Style", "Source Serif 4", ui-serif, Georgia, serif;
+  --sans: Inter, ui-sans-serif, system-ui, sans-serif;
+  --mono: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg:#0e0e12; --surface:#16161c; --ink:#f1f1f4; --ink-soft:#a8a8b3; --rule:#2a2a32; }
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--ink); margin: 0; }
+body { font: 17px/1.55 var(--serif); }
+.wrap { max-width: 1280px; margin: 3rem auto; padding: 0 1.5rem; }
+header.top { margin-bottom: 3rem; }
+header.top h1 { font-size: 2.2rem; line-height: 1.15; letter-spacing: -.01em; margin: 0 0 .4em; }
+header.top .crumb { color: var(--ink-soft); font: 13px/1 var(--sans); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 1em; }
+header.top .prompt { color: var(--ink-soft); font-style: italic; border-left: 3px solid var(--accent); padding-left: 1em; margin: 1em 0 0; }
+.options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+@media (max-width: 900px) { .options { grid-template-columns: 1fr; } }
+article.option { background: var(--surface); border: 1px solid var(--rule); border-radius: 4px; padding: 1.5rem; }
+article.option .num { font: 600 13px/1 var(--sans); color: var(--ink-soft); letter-spacing: .08em; }
+article.option h2 { font-size: 1.25rem; margin: .3em 0 .6em; line-height: 1.2; }
+article.option .desc { color: var(--ink-soft); font-size: .95rem; margin-bottom: 1.2em; }
+pre { background: var(--bg); border: 1px solid var(--rule); padding: .9rem; border-radius: 3px; overflow-x: auto; font: 13px/1.45 var(--mono); margin: 0 0 1.2em; }
+.proscons { width: 100%; border-collapse: collapse; margin-bottom: 1em; }
+.proscons th { font: 600 11px/1 var(--sans); text-transform: uppercase; letter-spacing: .08em; padding: .4em .6em; text-align: left; color: var(--ink-soft); border-bottom: 1px solid var(--rule); }
+.proscons th:first-child { color: var(--ok); }
+.proscons th:last-child { color: var(--danger); }
+.proscons td { font-size: .9rem; padding: .5em .6em; vertical-align: top; line-height: 1.4; border-bottom: 1px solid var(--rule); }
+.proscons td:first-child { width: 50%; }
+dl.metrics { display: grid; grid-template-columns: max-content 1fr; gap: .15em .8em; margin: 0; padding-top: .8em; border-top: 1px solid var(--rule); font: 13px/1.4 var(--sans); }
+dl.metrics dt { color: var(--ink-soft); }
+dl.metrics dd { margin: 0; font-weight: 500; }
+footer.recommend { margin-top: 3rem; background: var(--surface); border: 1px solid var(--rule); border-left: 4px solid var(--accent); padding: 1.5rem 2rem; border-radius: 4px; }
+footer.recommend h2 { margin: 0 0 .5em; font-size: 1.4rem; }
+footer.recommend p { margin: .6em 0; }
+footer.recommend strong { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="crumb">Exploration · Hono backend / streaming</div>
+  <h1>Three ways to do SSE streaming in Hono</h1>
+  <p class="prompt">Compare three approaches to SSE streaming in a Hono backend for a sandboxed agent integration — focus on backpressure, cancellation, and fitting the existing Hono middleware chain.</p>
+</header>
+
+<section class="options">
+
+  <article class="option">
+    <div class="num">01</div>
+    <h2>Hand-rolled <code>ReadableStream</code></h2>
+    <p class="desc">Build the SSE stream by hand and return it from the handler with the right headers.</p>
+<pre><code>app.get('/chat/stream', (c) =&gt; {
+  const stream = new ReadableStream({
+    start(controller) {
+      const enc = new TextEncoder();
+      const send = (data) =&gt;
+        controller.enqueue(enc.encode(`data: ${data}\n\n`));
+
+      const interval = setInterval(() =&gt; send(JSON.stringify({tok: 'hi'})), 50);
+      c.req.raw.signal.addEventListener('abort', () =&gt; {
+        clearInterval(interval); controller.close();
+      });
+    },
+  });
+  return new Response(stream, {
+    headers: { 'content-type': 'text/event-stream' },
+  });
+});</code></pre>
+    <table class="proscons">
+      <tr><th>Pro</th><th>Con</th></tr>
+      <tr><td>Zero dependencies</td><td>Manual SSE framing — easy to forget the double newline</td></tr>
+      <tr><td>Total control over backpressure</td><td>Cancellation is wired by hand on every route</td></tr>
+      <tr><td>Native to Web Streams; runs anywhere Hono runs</td><td>Easy to leak intervals/timers if abort is missed</td></tr>
+    </table>
+    <dl class="metrics">
+      <dt>Bundle</dt><dd>+0 kb</dd>
+      <dt>Backpressure</dt><dd>manual</dd>
+      <dt>Cancel</dt><dd>via <code>req.raw.signal</code></dd>
+      <dt>Edge runtime</dt><dd>yes</dd>
+    </dl>
+  </article>
+
+  <article class="option">
+    <div class="num">02</div>
+    <h2>Hono's <code>streamSSE</code> helper</h2>
+    <p class="desc">Hono ships a helper that handles SSE framing, abort signal wiring, and ping/keepalive.</p>
+<pre><code>import { streamSSE } from 'hono/streaming';
+
+app.get('/chat/stream', (c) =&gt; {
+  return streamSSE(c, async (stream) =&gt; {
+    stream.onAbort(() =&gt; console.log('client gone'));
+    while (!stream.aborted) {
+      await stream.writeSSE({
+        data: JSON.stringify({ tok: 'hi' }),
+        event: 'token',
+      });
+      await stream.sleep(50);
+    }
+  });
+});</code></pre>
+    <table class="proscons">
+      <tr><th>Pro</th><th>Con</th></tr>
+      <tr><td>SSE framing handled — no manual <code>data:</code> + double newline</td><td>One more abstraction layer in stack traces</td></tr>
+      <tr><td><code>onAbort</code> + <code>stream.aborted</code> are first-class</td><td>Tied to Hono — locks you in slightly</td></tr>
+      <tr><td>Built-in <code>sleep</code> respects abort, no leaked timers</td><td>Helper is fairly young; a few sharp edges remain</td></tr>
+    </table>
+    <dl class="metrics">
+      <dt>Bundle</dt><dd>+0 kb (in Hono)</dd>
+      <dt>Backpressure</dt><dd>via <code>await write</code></dd>
+      <dt>Cancel</dt><dd>built-in</dd>
+      <dt>Edge runtime</dt><dd>yes</dd>
+    </dl>
+  </article>
+
+  <article class="option">
+    <div class="num">03</div>
+    <h2>SDK pass-through</h2>
+    <p class="desc">Stream directly from the Anthropic SDK's <code>messages.stream()</code> response into Hono's response — no intermediate buffer.</p>
+<pre><code>import Anthropic from '@anthropic-ai/sdk';
+import { streamSSE } from 'hono/streaming';
+
+const client = new Anthropic();
+
+app.post('/chat/stream', (c) =&gt; {
+  return streamSSE(c, async (stream) =&gt; {
+    const upstream = await client.messages.stream({ /* … */ });
+    for await (const ev of upstream) {
+      if (stream.aborted) { upstream.controller.abort(); return; }
+      await stream.writeSSE({ event: ev.type, data: JSON.stringify(ev) });
+    }
+  });
+});</code></pre>
+    <table class="proscons">
+      <tr><th>Pro</th><th>Con</th></tr>
+      <tr><td>Backpressure propagates end-to-end (no buffer)</td><td>Couples your SSE schema to the SDK's event shape</td></tr>
+      <tr><td>Client cancellation correctly aborts upstream API call</td><td>Re-emitting structured events to the browser is your job</td></tr>
+      <tr><td>Minimal code; single source of truth for events</td><td>Harder to inject your own events (cost, audit, custom)</td></tr>
+    </table>
+    <dl class="metrics">
+      <dt>Bundle</dt><dd>SDK already imported</dd>
+      <dt>Backpressure</dt><dd>end-to-end</dd>
+      <dt>Cancel</dt><dd>propagates upstream</dd>
+      <dt>Edge runtime</dt><dd>yes (with fetch transport)</dd>
+    </dl>
+  </article>
+
+</section>
+
+<footer class="recommend">
+  <h2>Recommendation</h2>
+  <p>Go with <strong>option 02 (<code>streamSSE</code>)</strong> as the default route shape, and reach for <strong>option 03's pass-through pattern inside it</strong> when the route is forwarding an Anthropic stream rather than producing its own events.</p>
+  <p>Option 01 is the right answer only if you want zero coupling to Hono's helpers — for a Hono backend you already chose, the helper is a clear win and removes a class of "I forgot the double newline" bugs.</p>
+  <p>Combining 02 + 03 — using <code>streamSSE</code> as the route container and forwarding the SDK stream inside it — gets you correct cancellation in both directions and lets you mix in your own audit/cost events without giving up the helper's framing.</p>
+</footer>
+
+</div>
+</body>
+</html>

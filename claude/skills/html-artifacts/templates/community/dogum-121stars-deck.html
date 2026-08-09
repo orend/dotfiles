@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>HTML &gt; Markdown — a deck</title>
+<style>
+:root {
+  --bg: #0e0e12; --surface: #16161c; --ink: #f1f1f4; --ink-soft: #a8a8b3;
+  --rule: #2a2a32; --accent: #a78bfa; --accent-2: #34d399; --warn: #f59e0b;
+  --serif: Charter, "Iowan Old Style", "Source Serif 4", ui-serif, Georgia, serif;
+  --sans: Inter, ui-sans-serif, system-ui, sans-serif;
+  --mono: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, monospace;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); font: 24px/1.4 var(--sans); overflow: hidden; }
+.slide {
+  display: none;
+  position: absolute; inset: 0;
+  padding: 8vh 10vw;
+  flex-direction: column;
+  justify-content: center;
+}
+.slide.active { display: flex; }
+.kicker { font: 600 14px var(--sans); text-transform: uppercase; letter-spacing: .14em; color: var(--accent); margin-bottom: 1.2em; }
+h1 { font: 600 6vmin/1.1 var(--sans); letter-spacing: -.015em; margin: 0 0 .25em; }
+h2 { font: 500 4.5vmin/1.15 var(--sans); margin: 0 0 .8em; letter-spacing: -.01em; }
+.lead { font: 300 3vmin/1.45 var(--serif); color: var(--ink-soft); max-width: 26em; margin: 0; }
+.tiny { font: 14px var(--sans); color: var(--ink-soft); }
+
+.counter {
+  position: fixed; bottom: 1.2em; right: 1.5em;
+  font: 13px var(--mono); color: var(--ink-soft);
+}
+.hint {
+  position: fixed; bottom: 1.2em; left: 1.5em;
+  font: 12px var(--sans); color: var(--ink-soft); opacity: .65;
+}
+kbd {
+  background: var(--surface); border: 1px solid var(--rule);
+  border-radius: 3px; padding: 1px 6px; font: 11px var(--mono);
+}
+
+/* ── Slide 1 — Title ────────────────────────────────── */
+#s1 .stack { display: flex; flex-direction: column; gap: .25em; }
+#s1 .stack span:first-child { color: var(--ink-soft); }
+#s1 .stack span.big { font-size: 8vmin; font-weight: 700; line-height: 1; }
+#s1 .stack span.eq { font-size: 3vmin; color: var(--accent); margin-top: .4em; }
+
+/* ── Slide 2 — Quote/thesis ─────────────────────────── */
+#s2 blockquote { font: 300 5vmin/1.25 var(--serif); margin: 0; padding-left: .6em; border-left: 4px solid var(--accent); max-width: 22em; }
+#s2 blockquote em { font-style: normal; background: linear-gradient(180deg, transparent 65%, color-mix(in srgb, var(--accent) 30%, transparent) 65%); padding: 0 .1em; }
+
+/* ── Slide 3 — Capability chart ─────────────────────── */
+#s3 .compare { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 0; margin-top: 1em; font: 16px var(--sans); border-top: 1px solid var(--rule); }
+#s3 .compare > div { padding: .85em 1em; border-bottom: 1px solid var(--rule); }
+#s3 .compare > div:nth-child(3n+1) { color: var(--ink-soft); }
+#s3 .compare .yes { color: var(--accent-2); font-weight: 600; }
+#s3 .compare .no  { color: var(--warn); }
+#s3 .compare .head { font: 600 13px var(--sans); text-transform: uppercase; letter-spacing: .1em; color: var(--ink-soft); border-bottom-color: var(--accent); }
+
+/* ── Slide 4 — Side-by-side ─────────────────────────── */
+#s4 .split { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2em; margin-top: 1.5em; flex: 1; min-height: 0; }
+#s4 .pane { background: var(--surface); border: 1px solid var(--rule); border-radius: 4px; padding: 1em 1.2em; overflow: hidden; }
+#s4 .pane h3 { font: 600 14px var(--sans); margin: 0 0 .5em; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .08em; }
+#s4 .md { font: 13px/1.5 var(--mono); color: var(--ink-soft); white-space: pre-wrap; }
+#s4 .html { font-size: 14px; }
+#s4 .html .o { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .5em; margin: .5em 0; }
+#s4 .html .o div { padding: .5em; background: var(--bg); border: 1px solid var(--rule); border-radius: 3px; font-size: 11px; }
+#s4 .html .o div b { display: block; color: var(--accent); margin-bottom: .25em; font-size: 10px; text-transform: uppercase; letter-spacing: .08em; }
+
+/* ── Slide 5 — Sharing ──────────────────────────────── */
+#s5 .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 3em; margin-top: 2em; align-items: center; }
+#s5 .pair .one { text-align: center; }
+#s5 .pair .icon { font-size: 12vmin; line-height: 1; opacity: .7; }
+#s5 .pair .lbl { font: 600 1.2rem var(--sans); margin: .4em 0 .2em; }
+#s5 .pair .sub { font: 14px var(--sans); color: var(--ink-soft); }
+
+/* ── Slide 6 — Live interaction ─────────────────────── */
+#s6 .demo { margin-top: 2em; padding: 1.5em; background: var(--surface); border: 1px solid var(--rule); border-radius: 4px; max-width: 28em; }
+#s6 input[type=range] { width: 100%; accent-color: var(--accent); }
+#s6 .out { font: 600 5vmin var(--mono); color: var(--accent); margin-top: .3em; }
+#s6 .lblrow { display: flex; justify-content: space-between; font: 13px var(--sans); color: var(--ink-soft); }
+
+/* ── Slide 7 — Closing/meta ─────────────────────────── */
+#s7 .meta { font: 300 3vmin/1.45 var(--serif); max-width: 28em; }
+#s7 .self { font: 600 2.5vmin var(--mono); color: var(--accent); margin-top: 1.5em; }
+
+</style>
+</head>
+<body>
+
+<!-- 1 — Title -->
+<section id="s1" class="slide active">
+  <div class="kicker">A short deck</div>
+  <div class="stack">
+    <span class="big">HTML &gt; Markdown</span>
+    <span class="eq">— for the things agents now make</span>
+  </div>
+  <p class="lead" style="margin-top:2em">Seven slides. Arrow keys to advance.</p>
+</section>
+
+<!-- 2 — Thesis quote -->
+<section id="s2" class="slide">
+  <div class="kicker">02 · The thesis</div>
+  <blockquote>
+    Markdown is a <em>document</em> format.<br/>
+    The agent is making <em>artifacts</em>.
+  </blockquote>
+  <p class="lead" style="margin-top:1.6em">Plans, comparisons, reviews, status reports, editors. Things you read once and act on, not files you edit by hand.</p>
+</section>
+
+<!-- 3 — Capability table -->
+<section id="s3" class="slide">
+  <div class="kicker">03 · What the format can carry</div>
+  <h2>Information density</h2>
+  <div class="compare">
+    <div class="head">capability</div><div class="head">markdown</div><div class="head">html</div>
+
+    <div>headings, lists, links</div><div class="yes">yes</div><div class="yes">yes</div>
+    <div>tables</div><div class="yes">yes</div><div class="yes">yes</div>
+    <div>side-by-side layout</div><div class="no">no</div><div class="yes">yes</div>
+    <div>real diagrams (SVG)</div><div class="no">no</div><div class="yes">yes</div>
+    <div>color carrying meaning</div><div class="no">no</div><div class="yes">yes</div>
+    <div>interactive controls</div><div class="no">no</div><div class="yes">yes</div>
+    <div>round-trip editor</div><div class="no">no</div><div class="yes">yes</div>
+    <div>open by browser link</div><div class="no">no</div><div class="yes">yes</div>
+  </div>
+</section>
+
+<!-- 4 — Same content side by side -->
+<section id="s4" class="slide">
+  <div class="kicker">04 · Same content, two formats</div>
+  <h2>"Compare three approaches"</h2>
+  <div class="split">
+    <div class="pane">
+      <h3>as markdown</h3>
+      <div class="md">## Option 1: Inline
+- Pro: zero deps
+- Pro: easy to debug
+- Con: duplicated everywhere
+
+## Option 2: Custom hook
+- Pro: reusable
+- Pro: testable
+- Con: one more file
+
+## Option 3: Library
+- Pro: edge cases handled
+- Pro: well-tested
+- Con: +1.4 kb</div>
+    </div>
+    <div class="pane html">
+      <h3>as html</h3>
+      <div class="o">
+        <div><b>01 · inline</b>zero deps · low reuse · +0 kb</div>
+        <div><b>02 · hook</b>reusable · testable · +0.2 kb</div>
+        <div><b>03 · library</b>edge cases · well-tested · +1.4 kb</div>
+      </div>
+      <p class="tiny">Read horizontally. Pick one.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 5 — Sharing -->
+<section id="s5" class="slide">
+  <div class="kicker">05 · Distribution</div>
+  <h2>Markdown is an attachment.<br/>HTML is a link.</h2>
+  <div class="pair">
+    <div class="one">
+      <div class="icon">📎</div>
+      <div class="lbl">.md file</div>
+      <div class="sub">"Open it in your editor"<br/>"Render it locally"<br/>"Trust me, it's good"</div>
+    </div>
+    <div class="one">
+      <div class="icon">🔗</div>
+      <div class="lbl">.html link</div>
+      <div class="sub">paste in Slack<br/>open on phone<br/>actually read</div>
+    </div>
+  </div>
+</section>
+
+<!-- 6 — Live interaction -->
+<section id="s6" class="slide">
+  <div class="kicker">06 · Two-way interaction</div>
+  <h2>And the slide itself can do work.</h2>
+  <p class="lead">A slider, on a slide, in a browser. Markdown can't.</p>
+  <div class="demo">
+    <div class="lblrow"><span>Drag the slider</span><span id="srcLabel">50</span></div>
+    <input type="range" min="0" max="200" value="50" id="src"/>
+    <div class="out" id="out">→ 50²&nbsp;=&nbsp;2,500</div>
+  </div>
+</section>
+
+<!-- 7 — Closing / meta -->
+<section id="s7" class="slide">
+  <div class="kicker">07 · Closing</div>
+  <h2>This deck is itself an HTML file.</h2>
+  <p class="meta">One file. No build step. No PowerPoint, no Keynote, no export. Arrow keys you already know. Open it on any device. Share by link. Edit by re-prompting.</p>
+  <p class="self">$ open 06-deck.html</p>
+</section>
+
+<div class="counter"><span id="cur">1</span> / <span id="tot">7</span></div>
+<div class="hint"><kbd>←</kbd> <kbd>→</kbd> navigate · <kbd>F</kbd> fullscreen</div>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+let i = 0;
+document.getElementById('tot').textContent = slides.length;
+
+function go(n) {
+  i = Math.max(0, Math.min(slides.length - 1, n));
+  slides.forEach((s, idx) => s.classList.toggle('active', idx === i));
+  document.getElementById('cur').textContent = i + 1;
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { go(i + 1); e.preventDefault(); }
+  else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { go(i - 1); e.preventDefault(); }
+  else if (e.key === 'Home') go(0);
+  else if (e.key === 'End') go(slides.length - 1);
+  else if (e.key === 'f' || e.key === 'F') {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else document.documentElement.requestFullscreen();
+  }
+});
+
+// Slide 6 interactivity
+const src = document.getElementById('src');
+const srcLabel = document.getElementById('srcLabel');
+const out = document.getElementById('out');
+function update() {
+  const v = +src.value;
+  srcLabel.textContent = v;
+  out.innerHTML = `→ ${v}²&nbsp;=&nbsp;${(v * v).toLocaleString()}`;
+}
+src.addEventListener('input', update);
+</script>
+</body>
+</html>

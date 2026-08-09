@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Aurora — onboarding wireframe exploration</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      background: #fafafa;
+      color: #18181b;
+      font-family: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      padding: 64px 64px 96px;
+    }
+    .canvas { max-width: 1800px; margin: 0 auto; }
+    .canvas-head { margin-bottom: 56px; }
+    .canvas-head .crumb { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #71717a; letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 12px; }
+    .canvas-head h1 { font-size: 40px; line-height: 1.1; letter-spacing: -0.02em; font-weight: 600; margin: 0 0 12px; max-width: 22ch; }
+    .canvas-head .lede { font-size: 16px; color: #52525b; max-width: 60ch; line-height: 1.5; margin: 0; }
+    .canvas-head .meta {
+      display: flex; gap: 32px; margin-top: 24px;
+      font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #71717a;
+    }
+    .canvas-head .meta .kv { display: flex; gap: 6px; }
+    .canvas-head .meta .kv .k { color: #a1a1aa; }
+    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 32px; }
+    .cell {
+      background: #ffffff;
+      border: 1px solid #d4d4d8;
+      border-radius: 16px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .cell-head { display: flex; justify-content: space-between; align-items: baseline; }
+    .cell-head .label { font-size: 14px; font-weight: 600; color: #18181b; letter-spacing: 0.01em; }
+    .cell-head .num { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #a1a1aa; letter-spacing: 0.04em; }
+    .cell-sub { font-size: 13px; color: #71717a; line-height: 1.5; margin: -12px 0 0; }
+    .frame {
+      background: #f4f4f5;
+      border-radius: 12px;
+      padding: 24px;
+      min-height: 380px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    /* Wireframe primitives — greyscale only, dotted/dashed borders */
+    .ph { border: 1px dashed #a1a1aa; border-radius: 6px; padding: 12px; color: #71717a; font-size: 12px; }
+    .ph-img { display: flex; align-items: center; justify-content: center; height: 60px; }
+    .ph-row { display: flex; gap: 10px; }
+    .ph-row > * { flex: 1; }
+    .ph-bar { background: #e4e4e7; border-radius: 4px; height: 12px; }
+    .ph-bar.short { width: 60%; }
+    .ph-bar.med { width: 80%; }
+    .btn-wf { background: #18181b; color: #fafafa; border: none; padding: 10px 16px; border-radius: 8px; font: inherit; font-size: 13px; align-self: start; }
+    .btn-wf.ghost { background: transparent; color: #18181b; border: 1px solid #a1a1aa; }
+    .step-pip { display: flex; gap: 6px; margin-top: 4px; }
+    .step-pip span { flex: 1; height: 4px; background: #d4d4d8; border-radius: 2px; }
+    .step-pip span.active { background: #18181b; }
+    .label-sm { font-size: 11px; color: #a1a1aa; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.04em; text-transform: uppercase; }
+    .stack { display: flex; flex-direction: column; gap: 8px; }
+    .h-row { display: flex; justify-content: space-between; align-items: center; }
+    .icon-square { width: 36px; height: 36px; border: 1px dashed #a1a1aa; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #a1a1aa; }
+    .pip { display: flex; flex-direction: column; gap: 8px; }
+    .opt { border: 1px dashed #a1a1aa; border-radius: 8px; padding: 12px; font-size: 12px; color: #52525b; display: flex; justify-content: space-between; align-items: center; }
+    .opt.sel { border-style: solid; border-color: #18181b; background: #ffffff; }
+    .opt .check { width: 16px; height: 16px; border: 1px solid #71717a; border-radius: 50%; }
+    .opt.sel .check { background: #18181b; border-color: #18181b; }
+    .nav-bar { display: flex; gap: 8px; padding: 8px; border: 1px dashed #a1a1aa; border-radius: 999px; background: #ffffff; }
+    .nav-bar .nb { flex: 1; text-align: center; font-size: 11px; color: #71717a; padding: 6px; border-radius: 999px; }
+    .nav-bar .nb.active { background: #18181b; color: #fafafa; }
+  </style>
+</head>
+<body>
+  <div class="canvas">
+    <div class="canvas-head">
+      <div class="crumb">Aurora · Onboarding · Wireframe exploration</div>
+      <h1>Four ways to open the door.</h1>
+      <p class="lede">First-run onboarding for an offline-first journaling app. Four flows for the new-user moment, before high-fi commit. Greyscale, no real assets — speed over polish.</p>
+      <div class="meta">
+        <div class="kv"><span class="k">v</span><span>1</span></div>
+        <div class="kv"><span class="k">date</span><span>14 / MAY / 2026</span></div>
+        <div class="kv"><span class="k">author</span><span>design</span></div>
+        <div class="kv"><span class="k">status</span><span>review</span></div>
+      </div>
+    </div>
+
+    <div class="grid">
+
+      <!-- Cell 1: Single welcome screen -->
+      <div class="cell">
+        <div class="cell-head">
+          <div class="label">A · Single welcome</div>
+          <div class="num">01 / 04</div>
+        </div>
+        <p class="cell-sub">One screen, one decision. Skip onboarding entirely if signed in. Fastest path to value.</p>
+        <div class="frame">
+          <div class="ph ph-img">app icon</div>
+          <div class="stack" style="margin-top: 8px;">
+            <div class="ph-bar"></div>
+            <div class="ph-bar med"></div>
+            <div class="ph-bar short"></div>
+          </div>
+          <div class="ph" style="text-align: center; padding: 14px;">tagline · two lines · plain copy</div>
+          <div style="margin-top: auto; display: flex; flex-direction: column; gap: 8px;">
+            <button class="btn-wf">Start writing</button>
+            <button class="btn-wf ghost">I have an account</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cell 2: Pick a tone, multi-step -->
+      <div class="cell">
+        <div class="cell-head">
+          <div class="label">B · Pick a tone (3 steps)</div>
+          <div class="num">02 / 04</div>
+        </div>
+        <p class="cell-sub">Three small choices that personalize the prompt library. Higher engagement but adds friction.</p>
+        <div class="frame">
+          <div class="step-pip"><span class="active"></span><span class="active"></span><span></span></div>
+          <div class="label-sm">Step 2 of 3 · pick a writing tone</div>
+          <div class="pip" style="margin-top: 4px;">
+            <div class="opt sel"><span>Reflective · daily, slow, evening</span><span class="check"></span></div>
+            <div class="opt"><span>Sharp · short, mornings, accountability</span><span class="check"></span></div>
+            <div class="opt"><span>Curious · prompts, weekly cadence</span><span class="check"></span></div>
+            <div class="opt"><span>Free-form · no prompts at all</span><span class="check"></span></div>
+          </div>
+          <div style="margin-top: auto; display: flex; gap: 8px;">
+            <button class="btn-wf ghost" style="flex: 1;">Back</button>
+            <button class="btn-wf" style="flex: 1;">Continue</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cell 3: Just write — gated -->
+      <div class="cell">
+        <div class="cell-head">
+          <div class="label">C · Write first, ask later</div>
+          <div class="num">03 / 04</div>
+        </div>
+        <p class="cell-sub">Skip onboarding. Drop the user straight into a blank page. Account creation deferred until first save attempt.</p>
+        <div class="frame" style="background: #ffffff; border: 1px dashed #a1a1aa;">
+          <div class="h-row">
+            <div class="label-sm">Tuesday, May 14</div>
+            <div class="icon-square">···</div>
+          </div>
+          <div class="ph" style="border: none; padding: 0; color: #a1a1aa; font-style: italic;">Write something…</div>
+          <div style="flex: 1;"></div>
+          <div class="nav-bar">
+            <div class="nb active">Write</div>
+            <div class="nb">Past</div>
+            <div class="nb">Settings</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cell 4: Carousel of value props -->
+      <div class="cell">
+        <div class="cell-head">
+          <div class="label">D · Three-card value pitch</div>
+          <div class="num">04 / 04</div>
+        </div>
+        <p class="cell-sub">Carousel of three value propositions before sign-up. Highest education but highest drop-off — only for paid acquisition.</p>
+        <div class="frame">
+          <div class="step-pip"><span class="active"></span><span></span><span></span></div>
+          <div class="ph ph-img" style="height: 100px; border-style: solid; border-color: #d4d4d8;">illustration · placeholder</div>
+          <div class="stack">
+            <div class="ph-bar med"></div>
+            <div class="ph-bar"></div>
+            <div class="ph-bar short"></div>
+          </div>
+          <div class="ph" style="border: none; padding: 0; color: #71717a; line-height: 1.4;">Each card has one promise: privacy, no cloud, end-to-end.</div>
+          <div style="margin-top: auto; display: flex; justify-content: space-between; align-items: center;">
+            <span class="label-sm">1 of 3</span>
+            <button class="btn-wf">Next</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="margin-top: 56px; padding-top: 24px; border-top: 1px solid #e4e4e7; display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #a1a1aa;">
+      <span>4 variations · greyscale · dashed-border placeholders only</span>
+      <span>generated with claude-design-mode</span>
+    </div>
+  </div>
+</body>
+</html>

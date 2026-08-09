@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Tweaks sample</title>
+  <!--
+    Demo of the Tweaks workflow.
+
+    1. The EDITMODE block defines tweakable defaults. Exactly one such block per file,
+       valid strict JSON between the markers, primitive-only values.
+    2. The Tweaks panel auto-derives widgets from value types and applies live changes
+       via the onChange callback.
+    3. When the daemon (tweak-host.js) is running, every change is auto-persisted to
+       this file's EDITMODE block. When it isn't, live changes still apply, only
+       persistence is blocked (panel shows red dot).
+  -->
+  <style>
+    :root {
+      --primary: #D97757;
+    }
+    html, body { margin: 0; padding: 0; height: 100%; }
+    body {
+      display: flex; align-items: center; justify-content: center;
+      background: #fafafa; color: #18181b;
+      font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+      transition: background 0.2s, color 0.2s;
+    }
+    body.dark { background: #18181b; color: #fafafa; }
+    .hero { text-align: center; max-width: 640px; padding: 32px; }
+    h1 { font-size: 56px; margin: 0 0 16px; letter-spacing: -0.02em; font-weight: 600; }
+    p { font-size: 18px; opacity: 0.75; margin: 0 0 32px; }
+    .cta {
+      display: inline-block; background: var(--primary); color: white;
+      padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <h1 id="headline">A focused page</h1>
+    <p id="subhead">Tweak values in the panel — they apply live and persist to disk.</p>
+    <a class="cta" href="#" id="cta">Get started</a>
+  </div>
+
+  <script>
+    const heroDefaults = /*EDITMODE-BEGIN*/{
+      "primaryColor": "#D97757",
+      "fontSize": 56,
+      "headline": "A focused page",
+      "ctaLabel": "Get started",
+      "dark": false
+    }/*EDITMODE-END*/;
+  </script>
+  <script src="tweaks-panel.js"></script>
+  <script>
+    const filePath = location.protocol === 'file:'
+      ? decodeURIComponent(location.pathname)
+      : location.pathname;
+
+    function apply(all) {
+      document.documentElement.style.setProperty('--primary', all.primaryColor);
+      document.querySelector('h1').style.fontSize = all.fontSize + 'px';
+      document.getElementById('headline').textContent = all.headline;
+      document.getElementById('cta').textContent = all.ctaLabel;
+      document.body.classList.toggle('dark', all.dark);
+    }
+    apply(heroDefaults);
+
+    TweaksPanel.mount(heroDefaults, {
+      filePath: filePath,
+      onChange: (_key, _value, all) => apply(all),
+    });
+  </script>
+</body>
+</html>

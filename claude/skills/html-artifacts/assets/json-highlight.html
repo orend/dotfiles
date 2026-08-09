@@ -1,0 +1,50 @@
+<style>
+  .tok-key   { color: #9BB8D8; }   /* keys           */
+  .tok-str   { color: #C9B98A; }   /* string values  */
+  .tok-num   { color: #B7C39B; }   /* numbers        */
+  .tok-bool  { color: #D97757; }   /* true / false   */
+  .tok-null  { color: #87867F; font-style: italic; }
+  .tok-punct { color: #87867F; }   /* { } [ ] , :    */
+  .tok-cmt   { color: #87867F; font-style: italic; }   /* // comments  */
+</style>
+
+<script>
+  /* Auto-highlight <pre><code class="language-json"> AND bare <pre> blocks
+     whose body is valid JSON. Skips blocks inside .output-body or .codepre
+     so widget-rendered code (already styled) isn't double-processed. */
+  (function () {
+    function escapeHTML(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+    function highlight(src){
+      var i=0,n=src.length,out='';
+      function emit(c,t){out+='<span class="'+c+'">'+escapeHTML(t)+'</span>';}
+      while(i<n){
+        var c=src[i];
+        if(c==='/'&&src[i+1]==='/'){var j=src.indexOf('\n',i);if(j===-1)j=n;emit('tok-cmt',src.slice(i,j));i=j;continue;}
+        if(c==='"'){var j=i+1;while(j<n){if(src[j]==='\\'){j+=2;continue;}if(src[j]==='"'){j++;break;}j++;}
+          var k=j;while(k<n&&/\s/.test(src[k]))k++;emit(src[k]===':'?'tok-key':'tok-str',src.slice(i,j));i=j;continue;}
+        if('{}[]:,'.includes(c)){emit('tok-punct',c);i++;continue;}
+        if(/[\d-]/.test(c)){var m=src.slice(i).match(/^-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?/);if(m){emit('tok-num',m[0]);i+=m[0].length;continue;}}
+        if(/[a-z]/.test(c)){var m=src.slice(i).match(/^(true|false|null)\b/);if(m){emit(m[0]==='null'?'tok-null':'tok-bool',m[0]);i+=m[0].length;continue;}}
+        out+=escapeHTML(c);i++;
+      }
+      return out;
+    }
+    function process(){
+      document.querySelectorAll('pre code.language-json').forEach(function(el){
+        if(el.dataset.jsonHighlighted)return;el.dataset.jsonHighlighted='1';el.innerHTML=highlight(el.textContent);
+      });
+      document.querySelectorAll('pre').forEach(function(pre){
+        var code=pre.querySelector('code');
+        if(code&&/\blanguage-/.test(code.className))return;
+        if(pre.closest('.output-body')||pre.closest('.codepre'))return;
+        if(pre.dataset.jsonHighlighted)return;
+        var t=pre.textContent.trim();if(!t||(t[0]!=='{'&&t[0]!=='['))return;
+        try{JSON.parse(t);}catch(e){return;}
+        pre.dataset.jsonHighlighted='1';
+        if(code)code.innerHTML=highlight(t);else pre.innerHTML='<code>'+highlight(t)+'</code>';
+      });
+    }
+    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',process);
+    else process();
+  })();
+</script>

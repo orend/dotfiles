@@ -1,0 +1,54 @@
+<!-- Print / PDF support for document-shaped artifacts.
+     Paste inside the artifact's <style> block. Adapted from the aletuan fork of
+     html-effectiveness (see PROVENANCE.md); Apache-2.0.
+
+     Why this exists: report-shaped artifacts get "Save as PDF"-ed and mailed to
+     people who never open the .html. Without this, printing yields an ivory page
+     background eating a toner cartridge, toolbars and copy buttons rendered as
+     dead chrome, tables sliced across page breaks, and hyperlinks whose
+     destinations are invisible on paper.
+
+     Two hooks it relies on:
+       .no-print         screen-only chrome (toolbars, copy/export buttons,
+                         demo controls, in-page nav). Hidden when printed.
+       .no-print-sticky  a sticky/fixed element that should still appear in
+                         print but flow inline instead of staying pinned.
+
+     When integrating: (1) append this template's own card/panel class to the
+     break-inside rule, (2) tag screen-only chrome .no-print and pinned bars
+     .no-print-sticky, (3) if the file sets large body padding, reset it here.
+
+     Skip this for editor (18-20) and prototype (07-08) templates -- printing an
+     interactive tool is meaningless.
+
+     Dark artifacts: drop or adjust the `background: #fff` line, or you place
+     light text on a white page. Keep the dark surface and rely on
+     print-color-adjust: exact. -->
+<style>
+@media print {
+  /* keep on-screen color; only the page itself goes white */
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  html, body { background: #fff; }
+
+  @page { margin: 16mm 14mm; }
+
+  /* drop interactive chrome that means nothing on paper */
+  .no-print { display: none !important; }
+  button { display: none !important; }
+  .no-print-sticky { position: static !important; }
+
+  /* don't split atomic blocks across pages -- append this file's own
+     card/panel class to the list below when integrating */
+  table, tr, thead, figure, pre, blockquote, svg { break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; }
+  p, li { orphans: 3; widows: 3; }
+
+  /* show destination of external links (paper can't be clicked) */
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.82em;
+    color: var(--gray-500);
+    word-break: break-all;
+  }
+}
+</style>

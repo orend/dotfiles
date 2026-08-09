@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Powertrain workbench — sprint triage</title>
+<style>
+:root {
+  --bg: #fafaf7; --surface: #fff; --ink: #1a1a1f; --ink-soft: #555560;
+  --rule: #e7e5df; --accent: #8b5cf6;
+  --c-now:    #dc2626;
+  --c-next:   #d97706;
+  --c-later:  #2563eb;
+  --c-cut:    #6b7280;
+  --sans: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --mono: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg:#0e0e12; --surface:#16161c; --ink:#f1f1f4; --ink-soft:#a8a8b3; --rule:#2a2a32; }
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--ink); margin: 0; }
+body { font: 14px/1.4 var(--sans); padding: 1rem 1.5rem 5rem; }
+header { margin-bottom: 1.2rem; }
+header h1 { margin: 0 0 .25em; font-size: 1.4rem; font-weight: 600; letter-spacing: -.005em; }
+header p { margin: 0; color: var(--ink-soft); font-size: 13px; }
+.board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+@media (max-width: 900px) { .board { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 540px) { .board { grid-template-columns: 1fr; } }
+.col { background: var(--surface); border: 1px solid var(--rule); border-radius: 4px; min-height: 240px; display: flex; flex-direction: column; }
+.col[data-bucket=now]   { border-top: 3px solid var(--c-now); }
+.col[data-bucket=next]  { border-top: 3px solid var(--c-next); }
+.col[data-bucket=later] { border-top: 3px solid var(--c-later); }
+.col[data-bucket=cut]   { border-top: 3px solid var(--c-cut); }
+.col h2 { margin: 0; padding: .8em 1em .5em; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-soft); display: flex; justify-content: space-between; align-items: baseline; }
+.col h2 .count { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+.col .drop { flex: 1; padding: .25em .6em .8em; }
+.col .drop.over { background: rgba(139, 92, 246, 0.06); }
+.card {
+  background: var(--bg); border: 1px solid var(--rule); border-radius: 3px;
+  padding: .55em .7em; margin-bottom: .4em; cursor: grab;
+  transition: transform .08s, box-shadow .08s;
+}
+.card:hover { border-color: var(--accent); }
+.card:active { cursor: grabbing; }
+.card.dragging { opacity: .35; }
+.card .id { font: 600 11px var(--mono); color: var(--accent); display: inline-block; margin-right: .4em; }
+.card .title { font-weight: 500; }
+.card .why { color: var(--ink-soft); font-size: 12px; line-height: 1.4; margin-top: .25em; }
+.card .tags { margin-top: .35em; display: flex; flex-wrap: wrap; gap: .25em; }
+.card .tag { font: 10px var(--sans); padding: .15em .45em; background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; color: var(--ink-soft); cursor: pointer; }
+.card .tag.active { background: var(--accent); color: white; border-color: var(--accent); }
+.card[data-faded=true] { opacity: .25; }
+
+.actions {
+  position: fixed; left: 0; right: 0; bottom: 0;
+  background: var(--surface); border-top: 1px solid var(--rule);
+  padding: .8em 1.5em; display: flex; gap: .8em; align-items: center;
+  font-size: 13px;
+}
+.actions .summary { color: var(--ink-soft); flex: 1; font-variant-numeric: tabular-nums; }
+.actions .summary b { color: var(--ink); font-weight: 600; }
+.actions button {
+  font: 13px var(--sans); padding: .5em .9em; border: 1px solid var(--rule);
+  background: var(--bg); color: var(--ink); border-radius: 3px; cursor: pointer;
+}
+.actions button:hover { border-color: var(--accent); }
+.actions button.primary { background: var(--accent); color: white; border-color: var(--accent); }
+
+.toast {
+  position: fixed; left: 50%; bottom: 5rem; transform: translateX(-50%) translateY(20px);
+  background: var(--ink); color: var(--bg); padding: .6em 1em; border-radius: 3px;
+  font-size: 13px; opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Powertrain workbench — sprint triage</h1>
+  <p>8 tickets, pre-sorted into a best guess. Drag any card between columns until the cut feels right. Click a tag to filter. Copy out as markdown when you're done.</p>
+</header>
+
+<div class="board">
+  <section class="col" data-bucket="now"><h2>Now <span class="count" data-count="now">0</span></h2><div class="drop"></div></section>
+  <section class="col" data-bucket="next"><h2>Next <span class="count" data-count="next">0</span></h2><div class="drop"></div></section>
+  <section class="col" data-bucket="later"><h2>Later <span class="count" data-count="later">0</span></h2><div class="drop"></div></section>
+  <section class="col" data-bucket="cut"><h2>Cut <span class="count" data-count="cut">0</span></h2><div class="drop"></div></section>
+</div>
+
+<div class="actions">
+  <span class="summary">
+    <b><span data-count="now">0</span></b> now ·
+    <b><span data-count="next">0</span></b> next ·
+    <b><span data-count="later">0</span></b> later ·
+    <b><span data-count="cut">0</span></b> cut
+  </span>
+  <button id="reset">Reset</button>
+  <button id="clear-filter" hidden>Clear filter</button>
+  <button id="copy" class="primary">Copy as markdown</button>
+</div>
+
+<div class="toast" id="toast">Copied!</div>
+
+<script>
+const TICKETS = [
+  { id: 'PWR-101', title: 'Series-hybrid architecture support',
+    why: 'v4 only handles parallel and split. Series unlocks the locomotive comparison cases.',
+    tags: ['architecture', 'feature'], bucket: 'now' },
+  { id: 'PWR-102', title: 'Energy conservation check at integrator boundary',
+    why: 'Drift > 0.5% in long simulations. Suspect dt change at regen events.',
+    tags: ['physics', 'bug'], bucket: 'now' },
+  { id: 'PWR-103', title: 'Drive-cycle CSV importer',
+    why: 'Currently pasting columns into MATLAB. Should accept WLTP/UDDS/HWFET out of the box.',
+    tags: ['ux', 'feature'], bucket: 'next' },
+  { id: 'PWR-104', title: 'Peukert effect in battery model',
+    why: 'Range estimates optimistic at high discharge. Adds one parameter, ~10 lines.',
+    tags: ['physics', 'small'], bucket: 'next' },
+  { id: 'PWR-105', title: 'Regen efficiency curve tunable from UI',
+    why: 'Hardcoded constant today. Knob would unblock the heavy-truck comparison study.',
+    tags: ['ux', 'feature'], bucket: 'next' },
+  { id: 'PWR-106', title: 'Mission Control instrument cluster layout',
+    why: 'Side-by-side gauges instead of stacked. Mostly CSS; design already exists in journal.',
+    tags: ['ux', 'design'], bucket: 'later' },
+  { id: 'PWR-107', title: 'Validate against published Prius dyno data',
+    why: 'Sanity check the split-hybrid mode. Need to find the Argonne dataset link again.',
+    tags: ['physics', 'validation'], bucket: 'later' },
+  { id: 'PWR-108', title: 'Multi-vehicle comparison tab',
+    why: 'Cool but premature — single vehicle still has rough edges. Revisit after PWR-101.',
+    tags: ['feature', 'scope-creep'], bucket: 'cut' },
+];
+
+const INITIAL = TICKETS.map(t => ({ ...t }));
+let activeFilter = null;
+
+function render() {
+  document.querySelectorAll('.drop').forEach(d => d.innerHTML = '');
+  TICKETS.forEach(t => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.draggable = true;
+    card.dataset.id = t.id;
+    card.dataset.faded = activeFilter && !t.tags.includes(activeFilter);
+    card.innerHTML = `
+      <div><span class="id">${t.id}</span><span class="title">${t.title}</span></div>
+      <div class="why">${t.why}</div>
+      <div class="tags">${t.tags.map(tag =>
+        `<span class="tag${tag === activeFilter ? ' active' : ''}" data-tag="${tag}">${tag}</span>`
+      ).join('')}</div>
+    `;
+    card.addEventListener('dragstart', e => {
+      card.classList.add('dragging');
+      e.dataTransfer.setData('text/plain', t.id);
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    card.addEventListener('dragend', () => card.classList.remove('dragging'));
+    card.querySelectorAll('.tag').forEach(tagEl => {
+      tagEl.addEventListener('click', e => {
+        e.stopPropagation();
+        const tag = tagEl.dataset.tag;
+        activeFilter = activeFilter === tag ? null : tag;
+        document.getElementById('clear-filter').hidden = !activeFilter;
+        render();
+      });
+    });
+    document.querySelector(`.col[data-bucket="${t.bucket}"] .drop`).appendChild(card);
+  });
+  updateCounts();
+}
+
+function updateCounts() {
+  const counts = { now: 0, next: 0, later: 0, cut: 0 };
+  TICKETS.forEach(t => counts[t.bucket]++);
+  document.querySelectorAll('[data-count]').forEach(el => {
+    el.textContent = counts[el.dataset.count];
+  });
+}
+
+document.querySelectorAll('.drop').forEach(drop => {
+  drop.addEventListener('dragover', e => {
+    e.preventDefault();
+    drop.classList.add('over');
+  });
+  drop.addEventListener('dragleave', () => drop.classList.remove('over'));
+  drop.addEventListener('drop', e => {
+    e.preventDefault();
+    drop.classList.remove('over');
+    const id = e.dataTransfer.getData('text/plain');
+    const ticket = TICKETS.find(t => t.id === id);
+    if (ticket) {
+      ticket.bucket = drop.parentElement.dataset.bucket;
+      render();
+    }
+  });
+});
+
+document.getElementById('reset').addEventListener('click', () => {
+  TICKETS.forEach((t, i) => Object.assign(t, INITIAL[i]));
+  activeFilter = null;
+  document.getElementById('clear-filter').hidden = true;
+  render();
+});
+
+document.getElementById('clear-filter').addEventListener('click', () => {
+  activeFilter = null;
+  document.getElementById('clear-filter').hidden = true;
+  render();
+});
+
+document.getElementById('copy').addEventListener('click', async () => {
+  const out = ['# Sprint triage\n'];
+  ['now', 'next', 'later', 'cut'].forEach(b => {
+    const items = TICKETS.filter(t => t.bucket === b);
+    if (!items.length) return;
+    const heading = b === 'cut' ? 'Cut' : b.charAt(0).toUpperCase() + b.slice(1);
+    out.push(`\n## ${heading}\n`);
+    items.forEach(t => out.push(`- **${t.id}** ${t.title} — ${t.why}`));
+  });
+  const md = out.join('\n') + '\n';
+  try {
+    await navigator.clipboard.writeText(md);
+    showToast('Copied!');
+  } catch {
+    // Fallback: drop into a textarea the user can copy from
+    const ta = document.createElement('textarea');
+    ta.value = md;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    ta.remove();
+    showToast('Copied!');
+  }
+});
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1400);
+}
+
+render();
+</script>
+</body>
+</html>

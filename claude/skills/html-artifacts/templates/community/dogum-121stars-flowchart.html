@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Deploy pipeline — annotated flow</title>
+<style>
+:root {
+  --bg: #fafaf7; --surface: #fff; --ink: #1a1a1f; --ink-soft: #555560;
+  --rule: #e7e5df; --accent: #8b5cf6;
+  --happy: #15803d; --fail: #b91c1c; --neutral: #6b7280;
+  --serif: Charter, "Iowan Old Style", "Source Serif 4", ui-serif, Georgia, serif;
+  --sans: Inter, ui-sans-serif, system-ui, sans-serif;
+  --mono: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg:#0e0e12; --surface:#16161c; --ink:#f1f1f4; --ink-soft:#a8a8b3; --rule:#2a2a32; --neutral:#a8a8b3; }
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--ink); margin: 0; }
+body { font: 16px/1.55 var(--serif); }
+.wrap { max-width: 1080px; margin: 3rem auto; padding: 0 1.5rem; }
+header.top { margin-bottom: 1.5rem; }
+header.top h1 { font-size: 1.7rem; margin: 0 0 .3em; letter-spacing: -.005em; }
+header.top p { color: var(--ink-soft); margin: 0; }
+.layout { display: grid; grid-template-columns: 1fr 320px; gap: 1.5rem; align-items: start; }
+@media (max-width: 880px) { .layout { grid-template-columns: 1fr; } }
+
+.canvas { background: var(--surface); border: 1px solid var(--rule); border-radius: 4px; padding: 1.5rem; }
+.canvas svg { width: 100%; height: auto; cursor: default; display: block; }
+
+.legend { display: flex; gap: 1.2em; margin-top: 1em; font: 12px var(--sans); color: var(--ink-soft); flex-wrap: wrap; }
+.legend .sw { display: inline-block; width: 16px; height: 4px; vertical-align: middle; margin-right: .35em; border-radius: 2px; }
+
+.node-rect, .node-diamond { cursor: pointer; transition: filter .12s; }
+.node-rect:hover, .node-diamond:hover { filter: brightness(0.95) drop-shadow(0 0 0 var(--accent)); }
+.node-rect.active rect, .node-diamond.active polygon { stroke: var(--accent); stroke-width: 2.5; }
+.edge-label { font: 11px var(--sans); fill: var(--ink-soft); }
+
+aside.detail { background: var(--surface); border: 1px solid var(--rule); border-radius: 4px; padding: 1.2em 1.4em; position: sticky; top: 2rem; min-height: 360px; }
+aside.detail .step-num { font: 600 11px var(--sans); text-transform: uppercase; letter-spacing: .08em; color: var(--ink-soft); }
+aside.detail h3 { font-size: 1.1rem; margin: .3em 0 .8em; }
+aside.detail dl { display: grid; grid-template-columns: max-content 1fr; gap: .25em .9em; font: 13px/1.4 var(--sans); margin: 0 0 1em; }
+aside.detail dt { color: var(--ink-soft); }
+aside.detail dd { margin: 0; }
+aside.detail h4 { font: 600 11px var(--sans); text-transform: uppercase; letter-spacing: .08em; color: var(--ink-soft); margin: 1.3em 0 .4em; }
+aside.detail p, aside.detail li { font-size: 14px; line-height: 1.5; margin: .3em 0; }
+aside.detail code { font: 12px var(--mono); padding: 0 .2em; background: var(--bg); border-radius: 2px; }
+aside.detail .tip { font-size: 13px; color: var(--ink-soft); font-style: italic; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>Deploy pipeline — annotated flow</h1>
+  <p>From <code>git push</code> to production canary. Click any node for what runs there, expected duration, and the failure path.</p>
+</header>
+
+<div class="layout">
+
+<div class="canvas">
+<svg viewBox="0 0 700 380" role="img" aria-labelledby="title">
+  <title id="title">Deploy pipeline flowchart</title>
+  <defs>
+    <marker id="arr-h" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--happy)"/>
+    </marker>
+    <marker id="arr-f" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--fail)"/>
+    </marker>
+    <marker id="arr-n" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--neutral)"/>
+    </marker>
+  </defs>
+
+  <!-- Happy path edges (drawn first so nodes overlay) -->
+  <g fill="none" stroke="var(--happy)" stroke-width="2" marker-end="url(#arr-h)">
+    <line x1="120" y1="60"  x2="180" y2="60"/>   <!-- push -> ci -->
+    <line x1="320" y1="60"  x2="380" y2="60"/>   <!-- ci -> tests -->
+    <line x1="500" y1="60"  x2="555" y2="60"/>   <!-- tests -> build -->
+    <line x1="600" y1="80"  x2="600" y2="120"/>  <!-- build -> sign -->
+    <line x1="600" y1="170" x2="600" y2="195"/>  <!-- sign -> stage -->
+    <line x1="555" y1="220" x2="450" y2="220"/>  <!-- stage -> smoke -->
+    <line x1="380" y1="245" x2="380" y2="285"/>  <!-- smoke -> canary diamond -->
+    <line x1="380" y1="335" x2="380" y2="355"/> <!-- diamond -> prod (positions adjusted below) -->
+    <line x1="335" y1="310" x2="220" y2="310"/>  <!-- diamond -> abort -->
+  </g>
+
+  <!-- Failure / cancel edges -->
+  <g fill="none" stroke="var(--fail)" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arr-f)">
+    <line x1="440" y1="80"  x2="440" y2="320"/>  <!-- tests fail -> abort -->
+    <line x1="600" y1="240" x2="240" y2="320"/>  <!-- smoke fail -> abort (curved-ish) -->
+  </g>
+
+  <!-- Edge labels -->
+  <g class="edge-label">
+    <text x="148" y="55"  text-anchor="middle">webhook</text>
+    <text x="350" y="55"  text-anchor="middle">trigger</text>
+    <text x="528" y="55"  text-anchor="middle">pass</text>
+    <text x="615" y="105" >sign</text>
+    <text x="615" y="190" >push</text>
+    <text x="500" y="215" text-anchor="middle">ssh deploy</text>
+    <text x="395" y="270" >ok?</text>
+    <text x="345" y="305" text-anchor="end">no</text>
+    <text x="395" y="350" >yes</text>
+    <text x="445" y="170" text-anchor="start" fill="var(--fail)">test fail</text>
+    <text x="430" y="280" text-anchor="middle" fill="var(--fail)">smoke fail</text>
+  </g>
+
+  <!-- Nodes -->
+  <g class="node-rect" data-step="push">
+    <rect x="40" y="40" width="80" height="40" rx="6" fill="var(--bg)" stroke="currentColor" stroke-width="1.5"/>
+    <text x="80" y="65" text-anchor="middle" font-family="ui-sans-serif" font-size="13" fill="currentColor">git push</text>
+  </g>
+  <g class="node-rect" data-step="ci">
+    <rect x="180" y="40" width="140" height="40" rx="6" fill="var(--bg)" stroke="currentColor" stroke-width="1.5"/>
+    <text x="250" y="65" text-anchor="middle" font-family="ui-sans-serif" font-size="13" fill="currentColor">CI orchestrator</text>
+  </g>
+  <g class="node-rect" data-step="tests">
+    <rect x="380" y="40" width="120" height="40" rx="6" fill="var(--bg)" stroke="currentColor" stroke-width="1.5"/>
+    <text x="440" y="65" text-anchor="middle" font-family="ui-sans-serif" font-size="13" fill="currentColor">unit + lint</text>
+  </g>
+  <g class="node-rect" data-step="build">
+    <rect x="555" y="40" width="90" height="40" rx="6" fill="var(--bg)" stroke="currentColor" stroke-width="1.5"/>
+    <text x="600" y="65" text-anchor="middle" font-family="ui-sans-serif" font-size="13" fill="currentColor">build</text>
+  </g>
+  <g class="node-rect" data-step="sign">
+    <rect x="555" y="125" width="90" height="40" rx="6" fill="var(--bg)" stroke="currentColor" stroke-width="1.5"/>
+    <text x="600" y="150" text-anchor="middle" font-family="ui-sans-serif" font-size="13" fill="currentColor">sign &amp; tag</text>
+  </g>
+  <g class="node-rect" data-step="stage">
+    <rect x="555" y="200" width="90" height="40" rx="6" fill="var(--bg)" stroke="currentColor" stroke-width="1.5"/>
+    <text x="600" y="225" text-anchor="middle" font-family="ui-sans-serif" font-size="13" fill="currentColor">staging</text>
+  </g>
+  <g class="node-rect" data-step="smoke">
+    <rect x="335" y="200" width="115" height="40" rx="6" fill="var(--bg)" stroke="currentColor" stroke-width="1.5"/>
+    <text x="392" y="225" text-anchor="middle" font-family="ui-sans-serif" font-size="13" fill="currentColor">smoke tests</text>
+  </g>
+  <g class="node-diamond" data-step="canary">
+    <polygon points="380,285 430,310 380,335 330,310" fill="var(--bg)" stroke="currentColor" stroke-width="1.5"/>
+    <text x="380" y="313" text-anchor="middle" font-family="ui-sans-serif" font-size="12" fill="currentColor">canary 5%</text>
+  </g>
+  <g class="node-rect" data-step="prod">
+    <rect x="320" y="350" width="120" height="30" rx="6" fill="var(--happy)" stroke="var(--happy)" stroke-width="1.5"/>
+    <text x="380" y="370" text-anchor="middle" font-family="ui-sans-serif" font-size="13" fill="white">production</text>
+  </g>
+  <g class="node-rect" data-step="abort">
+    <rect x="140" y="295" width="100" height="34" rx="6" fill="var(--bg)" stroke="var(--fail)" stroke-width="1.5"/>
+    <text x="190" y="317" text-anchor="middle" font-family="ui-sans-serif" font-size="13" fill="var(--fail)">abort &amp; alert</text>
+  </g>
+</svg>
+
+<div class="legend">
+  <span><span class="sw" style="background:var(--happy);"></span>happy path</span>
+  <span><span class="sw" style="background:var(--fail);"></span>failure path</span>
+  <span>Click a node →</span>
+</div>
+</div>
+
+<aside class="detail" id="detail">
+  <span class="step-num" id="d-step">Click a node</span>
+  <h3 id="d-title">Pick any step in the flowchart</h3>
+  <p id="d-blurb">Each node has a runbook entry — what runs, expected duration, and what failure looks like in our alerting.</p>
+  <p class="tip" id="d-tip" hidden></p>
+</aside>
+
+</div>
+</div>
+
+<script>
+const STEPS = {
+  push: {
+    title: 'git push to default branch',
+    blurb: 'Developer pushes to main; GitHub fires a webhook to our CI orchestrator. Branch protection requires green CI on the PR before merge, so by this point the commit has already passed once on the PR build.',
+    runs: '—',
+    duration: '< 1s',
+    failure: 'Push rejected by branch protection (force push, missing review). Surfaces in the user’s git output, not in alerting.',
+  },
+  ci: {
+    title: 'CI orchestrator',
+    blurb: 'Receives the webhook, fans out test/lint/build jobs across worker pool, and serializes the deploy chain. Concurrency: 1 deploy per service.',
+    runs: 'workflows/deploy.yml',
+    duration: '5–10s queue',
+    failure: 'Webhook drop → no CI run starts. Backstop: cron job every 5min reconciles main commits with attempted runs.',
+  },
+  tests: {
+    title: 'Unit tests + lint',
+    blurb: 'Runs the full unit suite and lint across the matrix. Integration tests run in a parallel job and gate the merge but are not on the deploy critical path here.',
+    runs: 'pytest -n auto · ruff · mypy',
+    duration: '~3 min',
+    failure: 'Pipeline aborts. Author paged via the CI’s failure-on-main rule. No production change.',
+  },
+  build: {
+    title: 'Build container image',
+    blurb: 'Builds and pushes the OCI image to the internal registry. Tag includes the commit SHA and a monotonic build counter.',
+    runs: 'docker buildx · skopeo copy',
+    duration: '90–120s',
+    failure: 'Build fail aborts pipeline. Common causes: cache miss + slow base layer, registry auth lapse.',
+  },
+  sign: {
+    title: 'Sign &amp; attest',
+    blurb: 'Cosign signature on the image, in-toto attestation for the build provenance, SBOM generated and stored.',
+    runs: 'cosign sign · syft sbom',
+    duration: '~10s',
+    failure: 'Signing key unavailable → pipeline halts; ops paged. We never deploy unsigned images.',
+  },
+  stage: {
+    title: 'Deploy to staging',
+    blurb: 'Rolling deploy to staging cluster (3 replicas). Old replicas drained gracefully; readiness probe must pass before traffic shifts.',
+    runs: 'kubectl rollout · helm upgrade',
+    duration: '60–90s',
+    failure: 'Rollout times out → automatic rollback to previous revision. Notifies #deploys.',
+  },
+  smoke: {
+    title: 'Smoke tests against staging',
+    blurb: 'Runs ~30 black-box tests against staging endpoints. Includes the auth flow, a canonical write+read, and the metrics ingestion path.',
+    runs: 'tests/smoke/*.py',
+    duration: '45–75s',
+    failure: 'Any failure aborts production canary. Engineer on call investigates; staging is rolled back if the failure was caused by this deploy.',
+  },
+  canary: {
+    title: 'Canary at 5%',
+    blurb: 'Routes 5% of production traffic to the new revision for 10 minutes. Watches error rate, p95 latency, and a basket of business metrics. Continues to 100% if all green.',
+    runs: 'flagger · prometheus rules',
+    duration: '~10 min observation',
+    failure: 'Auto-abort on any guarded metric breach. Old revision retains 100% of traffic; engineer on call paged.',
+  },
+  prod: {
+    title: 'Production (100%)',
+    blurb: 'Full rollout. Annotation pushed to Grafana for the incident timeline, deployment marker recorded in Slack #deploys.',
+    runs: 'flagger promote',
+    duration: '60s rollout',
+    failure: 'Manual rollback via `deploy revert <service>`; auto-rollback for SLO-burn.',
+  },
+  abort: {
+    title: 'Abort &amp; alert',
+    blurb: 'Terminal failure path. Slack #deploys gets the diff between attempted and previous revisions. PagerDuty triggered if the failure happened past staging.',
+    runs: 'rollback hooks · pagerduty trigger',
+    duration: 'instant',
+    failure: 'If the abort itself fails (rare), an out-of-band alert fires from the meta-monitoring rule.',
+  },
+};
+
+const detail = {
+  step: document.getElementById('d-step'),
+  title: document.getElementById('d-title'),
+  blurb: document.getElementById('d-blurb'),
+  tip: document.getElementById('d-tip'),
+};
+
+function selectNode(name) {
+  document.querySelectorAll('[data-step]').forEach(n => {
+    n.classList.toggle('active', n.dataset.step === name);
+  });
+  const s = STEPS[name];
+  if (!s) return;
+  detail.step.textContent = name;
+  detail.title.innerHTML = s.title;
+  detail.blurb.innerHTML = `${s.blurb}<br><br>` +
+    `<dl><dt>Runs</dt><dd><code>${s.runs}</code></dd>` +
+    `<dt>Duration</dt><dd>${s.duration}</dd>` +
+    `<dt>On failure</dt><dd>${s.failure}</dd></dl>`;
+}
+
+document.querySelectorAll('[data-step]').forEach(node => {
+  node.addEventListener('click', () => selectNode(node.dataset.step));
+});
+</script>
+</body>
+</html>
