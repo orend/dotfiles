@@ -1,0 +1,47 @@
+# skill<tab>destinations (agents, codex, claude)
+# Only explicitly shared, canonical notes skills belong here. Preserve all other
+# client discovery entries, aliases, bundled skills, plugins, and invocation state.
+agent-evaluation	agents,codex,claude
+analyze-mlflow-chat-session	agents,codex,claude
+analyze-mlflow-trace	agents,codex,claude
+brainstorming	agents,codex,claude
+cli-creator	agents,codex,claude
+code-review	agents,codex,claude
+codebase-design	agents,codex,claude
+databricks	agents,codex,claude
+databricks-dbsql	agents,codex,claude
+databricks-jobs	agents,codex,claude
+databricks-mlflow-evaluation	agents,codex,claude
+databricks-model-serving	agents,codex,claude
+databricks-unity-catalog	agents,codex,claude
+databricks-vector-search	agents,codex,claude
+diagnosing-bugs	agents,codex,claude
+find-skills	agents,codex,claude
+gh-address-comments	agents,codex,claude
+gh-fix-ci	agents,codex,claude
+gif-creator	agents,codex,claude
+grill-me	agents,codex,claude
+grill-with-docs	agents,codex,claude
+grilling	agents,codex,claude
+handoff	agents,codex,claude
+implement	agents,codex,claude
+improve-codebase-architecture	agents,codex,claude
+instrumenting-with-mlflow-tracing	agents,codex,claude
+migrate-to-codex	agents,codex,claude
+mlflow-onboarding	agents,codex,claude
+playwright	agents,codex,claude
+pr-steward	codex
+querying-mlflow-metrics	agents,codex,claude
+research	agents,codex,claude
+retrieving-mlflow-traces	agents,codex,claude
+screenshot	agents,codex,claude
+searching-mlflow-docs	agents,codex,claude
+setup-matt-pocock-skills	agents,codex,claude
+setup-pre-commit	agents,codex,claude
+spark-python-data-source	agents,codex,claude
+tdd	agents,codex,claude
+teach	agents,codex,claude
+to-questionnaire	agents,codex,claude
+wait-what	agents,codex,claude
+wayfinder	agents,codex,claude
+writing-for-agents	agents,codex,claude
