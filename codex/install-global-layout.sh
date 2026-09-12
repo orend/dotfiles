@@ -27,12 +27,23 @@ dotfiles_dir=$(cd "$(dirname "$0")/.." && pwd)
 manifest="$dotfiles_dir/codex/shared-skills.tsv"
 issues=0
 
+test -f "$dotfiles_dir/codex/AGENTS.md" || { echo "missing Codex instructions" >&2; exit 1; }
+test -f "$dotfiles_dir/claude/CLAUDE.md" || { echo "missing Claude instructions" >&2; exit 1; }
+shopt -s nullglob
+agent_sources=("$dotfiles_dir"/codex/agents/*.toml)
+shopt -u nullglob
+[ "${#agent_sources[@]}" -gt 0 ] || { echo "missing Codex agent sources" >&2; exit 1; }
+
 while IFS=$'\t' read -r skill destinations; do
   case "$skill" in ""|\#*) continue ;; esac
   test -f "$notes_dir/codex/skills/$skill/SKILL.md" || {
     echo "missing canonical skill: $notes_dir/codex/skills/$skill/SKILL.md" >&2
     exit 1
   }
+  IFS=, read -r -a clients <<< "$destinations"
+  for client in "${clients[@]}"; do
+    case "$client" in agents|codex|claude) ;; *) echo "invalid client '$client' for $skill" >&2; exit 1 ;; esac
+  done
 done < "$manifest"
 
 link_managed() {
@@ -82,7 +93,7 @@ while IFS=$'\t' read -r skill destinations; do
   done
 done < "$manifest"
 
-for source in "$dotfiles_dir"/codex/agents/*.toml; do
+for source in "${agent_sources[@]}"; do
   link_managed "$source" "$target_home/.codex/agents/$(basename "$source")"
 done
 
