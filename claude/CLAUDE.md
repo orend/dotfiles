@@ -1,5 +1,13 @@
 # Global Claude Instructions
 
+## Scope and completion
+
+Treat a user request as authorization for routine, reversible implementation and
+validation within its stated scope. Do not ask again for ordinary steps needed to
+complete that work. Before reporting a change complete, run proportionate validation
+and state the result and any remaining boundary. Ask before an irreversible or
+external state change that the user has not explicitly authorized.
+
 ## Memory
 
 User profile and cross-project preferences are stored in `~/.claude/memory/`. Read `~/.claude/memory/MEMORY.md` at the start of each conversation to load context about the user.
