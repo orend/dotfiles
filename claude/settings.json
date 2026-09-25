@@ -59,6 +59,19 @@
       "mcp__plugin_context7_context7__resolve-library-id",
       "mcp__plugin_context7_context7__query-docs"
     ],
+    "deny": [
+      "Artifact",
+      "ArtifactData",
+      "ArtifactComments",
+      "DesignSync",
+      "EndConversation",
+      "SendFeedback",
+      "Workflow",
+      "EnterPlanMode",
+      "ExitPlanMode",
+      "ReportFindings",
+      "NotebookEdit"
+    ],
     "defaultMode": "auto"
   },
   "model": "opus[1m]",
