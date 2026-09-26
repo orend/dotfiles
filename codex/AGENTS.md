@@ -20,6 +20,47 @@ complete that work. Before reporting a change complete, run proportionate valida
 and state the result and any remaining boundary. Ask before an irreversible or
 external state change that the user has not explicitly authorized.
 
+## Agent routing
+
+When the user asks to launch, delegate to, or use an agent, infer the agent type from
+the requested work. Do not require the user to name an agent type. If the user names
+an agent type explicitly, use that type when it is compatible with the task.
+
+- A named skill that implements or repairs code, including `$implement-recon`, routes
+  to `feature-implementer` unless the skill itself requires a different specialist.
+- Pull-request review routes to `pr-reviewer`; read-only codebase or subsystem
+  investigation routes to `research-investigator`.
+- Focused mechanical work with objective acceptance criteria routes to
+  `bounded-worker`. Bounded batch work that needs more judgment routes to
+  `careful-worker`.
+- Session-history pattern analysis routes to `session-analyzer`; broad recent-session
+  mining routes to `session-explorer`; read-only Datadog incident investigation in a
+  workspace that defines it routes to `datadog-miner`.
+- Keep orchestration, task decomposition, ownership assignment, cross-agent synthesis,
+  and final completion judgment in the root session. Give implementation workers
+  explicit file or responsibility ownership and tell them to preserve concurrent work.
+
+Skill selection and agent selection are independent: first honor every explicitly
+named skill, then choose the configured agent whose responsibility matches that
+skill's workflow. The user's request to run a skill through an agent is sufficient;
+do not ask them to restate it with an agent-type name.
+
+If the collaboration runtime rejects or does not expose the selected named agent
+type, do not stop or ask the user to choose another type. Spawn a `default` agent
+with the selected role's responsibilities in its prompt and apply these explicit
+model settings:
+
+- `feature-implementer` and `pr-reviewer`: GPT-6 Sol with `high` effort.
+- `research-investigator`: GPT-6 Sol with `medium` effort.
+- `bounded-worker` and `session-explorer`: GPT-6 Luna with `medium` effort.
+- `careful-worker` and `session-analyzer`: GPT-6 Luna with `high` effort.
+- `datadog-miner`: GPT-6 Sol with `high` effort.
+
+Use a fresh or bounded history fork when an explicit model override is required, and
+include all task, skill, ownership, safety, and verification context needed by that
+agent. Treat this fallback as equivalent routing, not as permission to weaken the
+selected role's constraints.
+
 ## Commit messages
 
 Whenever you create a Git commit, use a concise Conventional Commit subject:
@@ -47,4 +88,3 @@ skill examples that spell `.venv/bin/python`.
   - Evals: `/Users/oren.dobzinski/lib/scribe/ai-scribe-evals/.venv/bin/python`
 - If a canonical interpreter is unavailable or cannot import a required dependency, report
   that concrete failure. Do not first run an intentionally nonexistent `.venv` path.
-
