@@ -8,7 +8,8 @@
     "CLAUDE_CODE_PLAN_V2_EXPLORE_AGENT_COUNT": "5",
     "CLAUDE_CODE_PLAN_MODE_INTERVIEW_PHASE": "false",
     "CLAUDE_CODE_UNATTENDED_RETRY": "1",
-    "DATABRICKS_CONFIG_PROFILE": "mmic"
+    "DATABRICKS_CONFIG_PROFILE": "mmic",
+    "DD_MCP_DOMAIN": "mcp.datadoghq.com"
   },
   "permissions": {
     "allow": [
@@ -45,7 +46,6 @@
       "Bash(env)",
       "Bash(source *)",
       "Bash(acli jira:*)",
-      "Bash(~/bin/slack-clip:*)",
       "Bash(osascript -)",
       "mcp__plugin_playwright_playwright__browser_navigate",
       "mcp__plugin_playwright_playwright__browser_take_screenshot",
@@ -57,7 +57,8 @@
       "mcp__plugin_databricks-ai-dev-kit_databricks__get_vs_endpoint",
       "mcp__plugin_databricks-ai-dev-kit_databricks__manage_job_runs",
       "mcp__plugin_context7_context7__resolve-library-id",
-      "mcp__plugin_context7_context7__query-docs"
+      "mcp__plugin_context7_context7__query-docs",
+      "Bash(~/bin/slack-clip:*)"
     ],
     "deny": [
       "Artifact",
@@ -74,7 +75,106 @@
     ],
     "defaultMode": "auto"
   },
-  "model": "opus[1m]",
+  "model": "us.anthropic.claude-opus-5-5",
+  "enabledPlugins": {
+    "superpowers@claude-plugins-official": false,
+    "jira@ai-platform": true,
+    "ecosystem@ai-platform": false,
+    "frontend-design@claude-plugins-official": true,
+    "skill-creator@claude-plugins-official": true,
+    "ralph-loop@claude-plugins-official": false,
+    "claude-md-management@claude-plugins-official": true,
+    "claude-code-setup@claude-plugins-official": true,
+    "explanatory-output-style@claude-plugins-official": false,
+    "databricks-ai-dev-kit@databricks-ai-dev-kit": false,
+    "code-review@claude-plugins-official": true,
+    "feature-dev@claude-plugins-official": true,
+    "commit-commands@claude-plugins-official": true,
+    "agent-sdk-dev@claude-plugins-official": false,
+    "plugin-dev@claude-plugins-official": false,
+    "self-improve@ai-platform": false,
+    "context7@claude-plugins-official": true,
+    "code-simplifier@claude-plugins-official": true,
+    "ema-query@ai-platform": true,
+    "hookify@claude-plugins-official": false,
+    "learning-output-style@claude-plugins-official": false,
+    "slack@claude-plugins-official": false,
+    "playground@claude-plugins-official": false,
+    "datadog@claude-plugins-official": true,
+    "claude-plugin-snyk@snyk-plugins": false,
+    "warp@claude-code-warp": false,
+    "eli5@claude-community": true
+  },
+  "extraKnownMarketplaces": {
+    "ai-platform": {
+      "source": {
+        "source": "directory",
+        "path": "/Users/oren.dobzinski/lib/ai-platform-dev-tools"
+      },
+      "autoUpdate": true
+    },
+    "databricks-ai-dev-kit": {
+      "source": {
+        "source": "github",
+        "repo": "databricks-solutions/ai-dev-kit"
+      },
+      "autoUpdate": true
+    },
+    "snyk-plugins": {
+      "source": {
+        "source": "github",
+        "repo": "snyk/claude-plugin-snyk"
+      }
+    },
+    "claude-code-warp": {
+      "source": {
+        "source": "github",
+        "repo": "warpdotdev/claude-code-warp"
+      }
+    },
+    "claude-community": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-plugins-community"
+      }
+    }
+  },
+  "effortLevel": "high",
+  "modelSettings": {
+    "claude-sonnet-5": {
+      "effortLevel": "high"
+    },
+    "claude-opus-5": {
+      "effortLevel": "high"
+    },
+    "claude-opus-5-5": {
+      "effortLevel": "high"
+    }
+  },
+  "skipWorkflowUsageWarning": true,
+  "verbose": false,
+  "skipAutoPermissionPrompt": true,
+  "additionalDirectories": [
+    {
+      "path": "~/lib/notes",
+      "readClaudeMd": true
+    },
+    {
+      "path": "~/lib/scribe/ai-scribe-model"
+    },
+    {
+      "path": "~/lib/scribe/ai-scribe-rags"
+    },
+    {
+      "path": "~/lib/scribe/ai-iac-model-serving"
+    },
+    {
+      "path": "~/lib/scribe/ai-scribe-training-data"
+    },
+    {
+      "path": "~/lib/scribe/ai-scribe-evals"
+    }
+  ],
   "hooks": {
     "PreToolUse": [
       {
@@ -235,81 +335,9 @@
       }
     ]
   },
-  "enabledPlugins": {
-    "superpowers@claude-plugins-official": true,
-    "jira@ai-platform": true,
-    "ecosystem@ai-platform": true,
-    "frontend-design@claude-plugins-official": true,
-    "skill-creator@claude-plugins-official": true,
-    "ralph-loop@claude-plugins-official": false,
-    "claude-md-management@claude-plugins-official": true,
-    "claude-code-setup@claude-plugins-official": true,
-    "explanatory-output-style@claude-plugins-official": true,
-    "databricks-ai-dev-kit@databricks-ai-dev-kit": true,
-    "code-review@claude-plugins-official": true,
-    "feature-dev@claude-plugins-official": true,
-    "commit-commands@claude-plugins-official": true,
-    "agent-sdk-dev@claude-plugins-official": false,
-    "plugin-dev@claude-plugins-official": false,
-    "self-improve@ai-platform": false,
-    "context7@claude-plugins-official": true,
-    "code-simplifier@claude-plugins-official": true,
-    "ema-query@ai-platform": true,
-    "hookify@claude-plugins-official": true,
-    "learning-output-style@claude-plugins-official": true,
-    "warp@claude-code-warp": true,
-    "slack@claude-plugins-official": true,
-    "playground@claude-plugins-official": false
-  },
-  "extraKnownMarketplaces": {
-    "ai-platform": {
-      "source": {
-        "source": "directory",
-        "path": "/Users/oren.dobzinski/lib/ai-platform-dev-tools"
-      },
-      "autoUpdate": true
-    },
-    "databricks-ai-dev-kit": {
-      "source": {
-        "source": "github",
-        "repo": "databricks-solutions/ai-dev-kit"
-      },
-      "autoUpdate": true
-    },
-    "claude-code-warp": {
-      "source": {
-        "source": "github",
-        "repo": "warpdotdev/claude-code-warp"
-      },
-      "autoUpdate": false
-    }
-  },
-  "effortLevel": "xhigh",
-  "skipAutoPermissionPrompt": true,
   "mcpServers": {
     "plugin_databricks-ai-dev-kit_databricks": {
       "alwaysLoad": true
     }
-  },
-  "additionalDirectories": [
-    {
-      "path": "~/lib/notes",
-      "readClaudeMd": true
-    },
-    {
-      "path": "~/lib/scribe/ai-scribe-model"
-    },
-    {
-      "path": "~/lib/scribe/ai-scribe-rags"
-    },
-    {
-      "path": "~/lib/scribe/ai-iac-model-serving"
-    },
-    {
-      "path": "~/lib/scribe/ai-scribe-training-data"
-    },
-    {
-      "path": "~/lib/scribe/ai-scribe-evals"
-    }
-  ]
+  }
 }
