@@ -23,6 +23,215 @@ grep-ext() { fgrep "$2" * -r $3 $4 --include "*.$1"; }
 alias reload='source ~/bin/dotfiles/bash/aliases'
 alias ea='mate -w ~/bin/dotfiles/bash/aliases && reload' # Edit aliases
 alias ee="mate ~/bin/dotfiles/bash/env"
+alias claude="ucode claude --provider mmic.inference_tables.mminfra-prod-bedrock --workspace https://modmed-dashboards.cloud.databricks.com"
+
+# Keep Warp tab titles aligned with the active Codex session name.
+# Codex writes session ids/names to ~/.codex/session_index.jsonl; for resumed
+# sessions we can read the id from argv, and for picker/new sessions a small
+# watcher discovers the session file opened by the Codex process.
+if [[ $- == *i* ]]; then
+  __warp_title() {
+    printf '\033]0;%s\a' "$*"
+  }
+
+  __warp_publish_context() {
+    local cwd="$1" branch head escaped_cwd escaped_branch escaped_head payload
+    [[ "${TERM_PROGRAM:-}" == "WarpTerminal" && -d "$cwd" && -n "${WARP_SESSION_ID:-}" ]] || return 0
+    declare -F warp_send_json_message >/dev/null 2>&1 || return 0
+    declare -F warp_escape_json >/dev/null 2>&1 || return 0
+
+    branch="$(git -C "$cwd" symbolic-ref --short HEAD 2>/dev/null)"
+    head="${branch:-$(git -C "$cwd" rev-parse --short HEAD 2>/dev/null)}"
+    escaped_cwd="$(warp_escape_json "$cwd")"
+    escaped_branch="$(warp_escape_json "$branch")"
+    escaped_head="$(warp_escape_json "$head")"
+    payload=$(printf '{"hook":"Precmd","value":{"exit_code":0,"next_block_id":"codex-launch-%s-%s","pwd":"%s","ps1":"","honor_ps1":false,"ps1_is_encoded":true,"git_head":"%s","git_branch":"%s","virtual_env":"","conda_env":"","node_version":"","session_id":%s}}' \
+      "$WARP_SESSION_ID" "$RANDOM" "$escaped_cwd" "$escaped_head" "$escaped_branch" "$WARP_SESSION_ID")
+    warp_send_json_message "$payload"
+  }
+
+  __codex_session_index() {
+    printf '%s/session_index.jsonl' "${CODEX_HOME:-$HOME/.codex}"
+  }
+
+  __codex_thread_name_for_id() {
+    local id="$1" index
+    index="$(__codex_session_index)"
+    [[ -n "$id" && -r "$index" ]] || return 1
+    awk -v id="$id" '
+      index($0, "\"id\":\"" id "\"") {
+        line = $0
+        sub(/^.*"thread_name":"?/, "", line)
+        sub(/".*$/, "", line)
+        name = line
+      }
+      END { if (name != "") print name }
+    ' "$index"
+  }
+
+  __codex_latest_session_id() {
+    local index line
+    index="$(__codex_session_index)"
+    [[ -r "$index" ]] || return 1
+    line="$(tail -n 1 "$index")"
+    [[ "$line" =~ \"id\":\"([^\"]+)\" ]] && printf '%s\n' "${BASH_REMATCH[1]}"
+  }
+
+  __codex_session_id_from_args() {
+    local arg
+    for arg in "$@"; do
+      if [[ "$arg" =~ ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$ ]]; then
+        printf '%s\n' "$arg"
+        return 0
+      fi
+    done
+    if [[ "$1" == "resume" || "$1" == "fork" ]]; then
+      for arg in "$@"; do
+        [[ "$arg" == "--last" ]] && __codex_latest_session_id && return 0
+      done
+    fi
+    return 1
+  }
+
+  __codex_session_id_from_path() {
+    local path="$1"
+    if [[ "$path" =~ ([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}) ]]; then
+      printf '%s\n' "${BASH_REMATCH[1]}"
+      return 0
+    fi
+    return 1
+  }
+
+  __codex_worktree_context() {
+    local root branch
+    root="$(git rev-parse --show-toplevel 2>/dev/null)" || return 0
+    branch="$(git branch --show-current 2>/dev/null)"
+    [[ -n "$branch" ]] || branch="detached@$(git rev-parse --short HEAD 2>/dev/null)"
+    printf '%s · %s\n' "$(basename "$root")" "$branch"
+  }
+
+  __codex_warp_title_watcher() {
+    local parent_pid="$1" fallback_id="$2" worktree_context="$3" last_title="" pid path id name title
+    while :; do
+      pid="$(pgrep -P "$parent_pid" -f '(^|/)codex([[:space:]]|$)' 2>/dev/null | head -n 1)"
+      path=""
+      [[ -n "$pid" ]] && path="$(lsof -Fn -p "$pid" 2>/dev/null | sed -n 's/^n//p' | grep '/.codex/sessions/.*\.jsonl$' | head -n 1)"
+      id="$fallback_id"
+      [[ -n "$path" ]] && id="$(__codex_session_id_from_path "$path")"
+      name="$(__codex_thread_name_for_id "$id")"
+      [[ -z "$name" && -n "$id" ]] && name="${id:0:8}"
+      if [[ -n "$name" ]]; then
+        title="codex: $name"
+        [[ -n "$worktree_context" ]] && title+=" · $worktree_context"
+      fi
+      if [[ -n "$title" && "$title" != "$last_title" ]]; then
+        __warp_title "$title"
+        last_title="$title"
+      fi
+      sleep 2
+    done
+  }
+
+  codex() {
+    local codex_bin="/opt/homebrew/bin/codex"
+    local session_id session_name worktree_context title watcher status arg has_yolo=0
+    local -a codex_args=()
+    [[ -x "$codex_bin" ]] || codex_bin="$(type -P codex)"
+
+    # All interactive Codex sessions use full access. `--yolo` is retained as
+    # a convenient shorthand even though the Codex CLI calls the flag below.
+    for arg in "$@"; do
+      case "$arg" in
+        --yolo)
+          ;;
+        --dangerously-bypass-approvals-and-sandbox)
+          has_yolo=1
+          codex_args+=("$arg")
+          ;;
+        *)
+          codex_args+=("$arg")
+          ;;
+      esac
+    done
+    [[ "$has_yolo" -eq 1 ]] || codex_args=(--dangerously-bypass-approvals-and-sandbox "${codex_args[@]}")
+
+    session_id="$(__codex_session_id_from_args "${codex_args[@]}")"
+    session_name="$(__codex_thread_name_for_id "$session_id")"
+    worktree_context="$(__codex_worktree_context)"
+    if [[ -n "$session_name" ]]; then
+      title="codex: $session_name"
+    else
+      title="codex"
+    fi
+    [[ -n "$worktree_context" ]] && title+=" · $worktree_context"
+    __warp_title "$title"
+
+    __codex_warp_title_watcher "$$" "$session_id" "$worktree_context" &
+    watcher=$!
+    "$codex_bin" "${codex_args[@]}"
+    status=$?
+    kill "$watcher" 2>/dev/null
+    wait "$watcher" 2>/dev/null
+    return "$status"
+  }
+
+  # Start Codex in a Scribe repository while retaining access to the notes
+  # workspace. `cd` is intentionally performed by this shell function so
+  # Warp's Git context follows the actual working tree.
+  codex-scribe() {
+    local selector="${1:-rags}" target notes_dir="/Users/oren.dobzinski/lib/notes" arg
+    local -a codex_args=()
+
+    case "$selector" in
+      rags)
+        target="/Users/oren.dobzinski/lib/scribe/ai-scribe-rags"
+        [[ $# -gt 0 ]] && shift
+        ;;
+      model)
+        target="/Users/oren.dobzinski/lib/scribe/ai-scribe-model"
+        [[ $# -gt 0 ]] && shift
+        ;;
+      notes)
+        target="$notes_dir"
+        [[ $# -gt 0 ]] && shift
+        ;;
+      /*)
+        target="$selector"
+        shift
+        ;;
+      -*)
+        target="/Users/oren.dobzinski/lib/scribe/ai-scribe-rags"
+        ;;
+      *)
+        printf 'Usage: codex-scribe {rags|model|notes|/absolute/worktree} [codex arguments...]\n' >&2
+        return 2
+        ;;
+    esac
+
+    if [[ ! -d "$target" ]]; then
+      printf 'Codex workspace does not exist: %s\n' "$target" >&2
+      return 1
+    fi
+
+    # These launchers are intentionally full-access. Accept the familiar
+    # shorthand too, but translate it before invoking Codex (whose CLI uses
+    # the longer flag below).
+    for arg in "$@"; do
+      [[ "$arg" == "--yolo" ]] || codex_args+=("$arg")
+    done
+
+    cd "$target" || return
+    __warp_publish_context "$target"
+    if [[ "$target" == "$notes_dir" ]]; then
+      codex --profile scribe --dangerously-bypass-approvals-and-sandbox "${codex_args[@]}"
+    else
+      codex --profile scribe --dangerously-bypass-approvals-and-sandbox --add-dir "$notes_dir" "${codex_args[@]}"
+    fi
+  }
+
+  alias crags='codex-scribe rags'
+  alias cmodel='codex-scribe model'
+fi
 
 # Quicker cd
 alias cg='cd /Library/Ruby/Gems/1.8/gems/'
