@@ -28,7 +28,27 @@ PATTERNS = [
     (re.compile(r"PydanticDeprecatedSince\d+"), "pydantic_deprecation"),
     # Node.js GitHub Action deprecation — observed 8x.
     (re.compile(r"Node\.js \d+ actions are deprecated"), "node_action_deprecation"),
+    # langchain deprecation — observed 30x in 2026-05-15 self-improve scan.
+    (re.compile(r"LangChainDeprecation\w*|langchain_core\..*?deprecated"), "langchain_deprecation"),
 ]
+
+# Short Python-error signatures that can appear WITHOUT a "Traceback" header.
+# Most common case: SyntaxError raised during parsing of ``python3 -c "..."``
+# or ``python3 <<EOF`` heredoc bodies — the parser errors out before the
+# runtime that draws tracebacks ever runs. Only used when the command was
+# clearly a Python invocation (PYTHON_COMMAND below).
+SHORT_PYTHON_ERROR = re.compile(
+    r"^\s*(?:File \"<string>\",?\s+line\s+\d+|"
+    r"(?:Syntax|Indentation|Tab)Error:\s)",
+    re.MULTILINE,
+)
+
+# Heuristic: was the Bash command clearly invoking Python?
+PYTHON_COMMAND = re.compile(
+    r"(?:^|[\s|;&(])(?:python3?|pytest)(?:\s|$)|"
+    r"python3?\s+-c\s|"
+    r"python3?\s*<<"
+)
 
 # Bash commands that legitimately produce tracebacks as part of normal
 # operation. Skip the warning when the command matches any of these.
@@ -82,13 +102,23 @@ def main():
     output = data.get("tool_output") or ""
     if not isinstance(output, str):
         output = str(output)
-    if len(output) < 30:
+
+    # Length floor — but waive it for Python commands, since SyntaxError
+    # output can be very short (e.g. "  File \"<string>\", line 1\n    ...")
+    is_python_cmd = bool(PYTHON_COMMAND.search(command))
+    if len(output) < 30 and not is_python_cmd:
         sys.exit(0)
 
     hits = []
     for pat, kind in PATTERNS:
         if pat.search(output):
             hits.append(kind)
+
+    # Catch short Python errors that lack a "Traceback" header (parser-level
+    # SyntaxError from -c / heredoc invocations). Only fires when the command
+    # was clearly Python and we didn't already match a full traceback.
+    if is_python_cmd and "python_traceback" not in hits and SHORT_PYTHON_ERROR.search(output):
+        hits.append("python_short_error")
 
     if not hits:
         sys.exit(0)
@@ -106,10 +136,16 @@ def main():
             parts.append(line)
         else:
             parts.append("Python traceback detected (no parseable summary)")
+    if "python_short_error" in hits:
+        # Pull out the actual error line for context.
+        m = re.search(r"^\s*((?:Syntax|Indentation|Tab|Name)Error:\s.+)$", output, re.MULTILINE)
+        parts.append(f"Python parser error: {m.group(1).strip() if m else 'see output'}")
     if "pydantic_deprecation" in hits:
         parts.append("Pydantic v2 deprecation warning — replace .parse_obj / .dict / .json with .model_validate / .model_dump / .model_dump_json")
     if "node_action_deprecation" in hits:
         parts.append("Node.js action deprecation warning — bump the GitHub Action to Node 20 or 22")
+    if "langchain_deprecation" in hits:
+        parts.append("LangChain deprecation — switch to the langchain_core successor API named in the warning")
 
     body = " · ".join(parts)
     # Cap to keep context-friendly.
