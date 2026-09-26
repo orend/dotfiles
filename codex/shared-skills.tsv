@@ -53,3 +53,9 @@ to-questionnaire	agents,codex,claude
 wait-what	agents,codex,claude
 wayfinder	agents,codex,claude
 writing-for-agents	agents,codex,claude
+recon-replay	agents,codex,claude
+recon-trace	agents,codex,claude
+recon-tracker-map	agents,codex,claude
+scribe-ci-parity	agents,codex,claude
+scribe-local-run	agents,codex,claude
+write-readback	agents,codex,claude
