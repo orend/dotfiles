@@ -20,6 +20,13 @@ complete that work. Before reporting a change complete, run proportionate valida
 and state the result and any remaining boundary. Ask before an irreversible or
 external state change that the user has not explicitly authorized.
 
+## RECON verification
+
+Before reporting an ai-scribe-rags RECON / Smart Merge change done, or before pushing a
+RECON branch, run `$recon-verify` from the changed worktree
+(`recon_verify.py run --repo "$PWD"`) and report its per-rung result. Do not substitute a
+hand-picked test command. If a rung is skipped or fails, say so.
+
 ## Agent routing
 
 When the user asks to launch, delegate to, or use an agent, infer the agent type from
