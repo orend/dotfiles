@@ -26,21 +26,9 @@ shopt -s nullglob
 # Skills to keep. Everything else under databricks-skills/ is deleted.
 # Curated for AI Scribe work (Oren Dobzinski, 2026-05-13). Verify before
 # expanding: each added skill costs ~250 chars of session-start context.
-KEEP=(
-  databricks-docs                # fallback for uncovered topics
-  databricks-config              # workspace / profile management
-  databricks-execution-compute   # run code on Databricks
-  databricks-jobs                # jobs management
-  databricks-vector-search       # RAG indexes
-  databricks-model-serving       # endpoints
-  databricks-aibi-dashboards     # Lakeview dashboards
-  databricks-mlflow-evaluation   # evals
-  databricks-app-python          # rag-pipeline + previsit apps
-  databricks-genie               # Genie spaces
-  databricks-unity-catalog       # UC tables / volumes
-  databricks-python-sdk          # SDK reference
-  databricks-lakebase-provisioned  # Lakebase ingestion path
-)
+# The shared Dev Platform skill set is the sole Databricks workflow catalog.
+# Keep the plugin enabled for its MCP server, but do not inject duplicate skills.
+KEEP=()
 
 # Iterate every cached plugin version under databricks-ai-dev-kit so the
 # hook keeps working after upgrades (the version dir changes on update).
