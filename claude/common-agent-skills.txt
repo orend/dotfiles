@@ -1,0 +1,32 @@
+# Canonical global skills used by both Codex and Claude Code.
+# Codex reads ~/.agents/skills directly; install.sh links only these entries
+# into ~/.claude/skills.  Do not add migration aliases or retired skills here.
+
+add-specialty-handler
+agent-evaluation
+analyze-mlflow-chat-session
+analyze-mlflow-trace
+brainstorming
+databricks
+databricks-dbsql
+databricks-gateway-call
+databricks-jobs
+databricks-mlflow-evaluation
+databricks-model-serving
+databricks-unity-catalog
+databricks-vector-search
+debug-l2
+debug-recon
+eval
+extend-workflow
+gif-creator
+instrumenting-with-mlflow-tracing
+mlflow-onboarding
+querying-mlflow-metrics
+request-review
+retrieving-mlflow-traces
+run-local
+run-rag
+searching-mlflow-docs
+spark-python-data-source
+update-ejson-schema

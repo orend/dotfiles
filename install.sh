@@ -73,6 +73,32 @@ for REPO in "$HOME"/lib/scribe/*/; do
   fi
 done
 
+# --- Link the deliberately shared global skill catalog for Claude Code ---
+# Codex discovers these sources directly from ~/.agents/skills.  Keep this
+# manifest explicit: it prevents legacy aliases and retired skills from
+# silently increasing Claude's session-start skill metadata.
+COMMON_AGENT_SKILLS_FILE="$DOTFILES_DIR/claude/common-agent-skills.txt"
+AGENT_SKILLS_DIR="$HOME/.agents/skills"
+NOTES_GATEWAY_SKILL="$NOTES_DIR/.claude/skills/databricks-gateway-call"
+mkdir -p "$AGENT_SKILLS_DIR"
+if [ -f "$NOTES_GATEWAY_SKILL/SKILL.md" ]; then
+  link_file "$NOTES_GATEWAY_SKILL" "$AGENT_SKILLS_DIR/databricks-gateway-call"
+fi
+if [ -f "$COMMON_AGENT_SKILLS_FILE" ]; then
+  echo "Symlinking shared agent skills for Claude Code..."
+  while IFS= read -r skill_name || [ -n "$skill_name" ]; do
+    case "$skill_name" in
+      ""|\#*) continue ;;
+    esac
+    skill_dir="$AGENT_SKILLS_DIR/$skill_name"
+    if [ ! -f "$skill_dir/SKILL.md" ]; then
+      echo "Error: shared skill $skill_name is missing $skill_dir/SKILL.md"
+      exit 1
+    fi
+    link_file "$skill_dir" "$HOME/.claude/skills/$skill_name"
+  done < "$COMMON_AGENT_SKILLS_FILE"
+fi
+
 # --- Symlink reference docs into per-project Claude memory ---
 ENCODED_NOTES=$(echo "$NOTES_DIR" | sed 's|^/||; s|/|-|g; s|\.|-|g')
 NOTES_MEMORY="$HOME/.claude/projects/-${ENCODED_NOTES}/memory"
