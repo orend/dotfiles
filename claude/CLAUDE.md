@@ -20,6 +20,11 @@ head) and `selftest`, and report the verdicts. `recon-verify` proves the tests p
 proves the reconciled note changed as intended. For a Model L2 or EMA-mapper change, run
 `verify-scribe compare` instead.
 
+When investigating a captured QA request with an SME expectation (for example under
+`investigate-recon-issue`), run `verify-smart-merge` `repro` (trace plus clause file) for the first bad
+boundary and a tracker-state draft, and `served` for delivery state. A capture without
+Prediction `uuid`s is refused; report it as blocked, not as not reproduced.
+
 ## Commit messages
 
 Whenever you create a Git commit, use a concise Conventional Commit subject:
