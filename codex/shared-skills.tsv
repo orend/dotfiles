@@ -59,3 +59,5 @@ recon-tracker-map	agents,codex,claude
 scribe-ci-parity	agents,codex,claude
 scribe-local-run	agents,codex,claude
 write-readback	agents,codex,claude
+verify-scribe	agents,codex,claude
+verify-smart-merge	agents,codex,claude
