@@ -299,6 +299,15 @@
             }
           }
         ]
+      },
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/bin/dotfiles/codex/refresh-skill-sources.sh --background"
+          }
+        ]
       }
     ],
     "InstructionsLoaded": [
