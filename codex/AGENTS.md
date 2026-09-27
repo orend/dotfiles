@@ -27,6 +27,11 @@ RECON branch, run `$recon-verify` from the changed worktree
 (`recon_verify.py run --repo "$PWD"`) and report its per-rung result. Do not substitute a
 hand-picked test command. If a rung is skipped or fails, say so.
 
+For a RECON behavior change, also run `$verify-smart-merge` `compare` on the affected feature (base vs
+head) and `selftest`, and report the verdicts. `recon-verify` proves the tests pass; this
+proves the reconciled note changed as intended. For a Model L2 or EMA-mapper change, run
+`$verify-scribe compare` instead.
+
 ## Agent routing
 
 When the user asks to launch, delegate to, or use an agent, infer the agent type from
