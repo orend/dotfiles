@@ -75,7 +75,7 @@
     ],
     "defaultMode": "auto"
   },
-  "model": "us.anthropic.claude-opus-5-5",
+  "model": "claude-opus-5-5",
   "enabledPlugins": {
     "superpowers@claude-plugins-official": false,
     "jira@ai-platform": true,

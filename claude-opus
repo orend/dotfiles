@@ -1,0 +1,6 @@
+#!/bin/bash
+set -euo pipefail
+
+# Managed model aliases may point at an unavailable gateway model ID.
+# An explicit CLI model takes precedence over those aliases and defaults.
+exec claude --model claude-opus-5-5 "$@"

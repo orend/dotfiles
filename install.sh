@@ -112,7 +112,8 @@ echo "Symlinking scripts to ~/bin..."
 mkdir -p "$HOME/bin"
 link_file "$DOTFILES_DIR/ec"    "$HOME/bin/ec"
 link_file "$DOTFILES_DIR/emacs" "$HOME/bin/emacs"
-chmod +x "$DOTFILES_DIR/ec" "$DOTFILES_DIR/emacs"
+link_file "$DOTFILES_DIR/claude-opus" "$HOME/bin/claude-opus"
+chmod +x "$DOTFILES_DIR/ec" "$DOTFILES_DIR/emacs" "$DOTFILES_DIR/claude-opus"
 
 # --- Install Homebrew packages ---
 echo "Installing Homebrew packages..."
