@@ -45,6 +45,13 @@ an agent type explicitly, use that type when it is compatible with the task.
 
 - A named skill that implements or repairs code, including `$implement-recon`, routes
   to `feature-implementer` unless the skill itself requires a different specialist.
+  Feature implementation uses Claude Opus 5.5 with `high` effort through the
+  `launch-opus-agents` skill and Claude Code (`--model system.ai.claude-opus-5-5 --effort high`;
+  verify returned `canonicalModel` is `claude-opus-5-5`).
+  Dispatch that worker directly from the root session when possible. The native
+  `feature-implementer` role is a Sol coordinator for that same Opus worker; it
+  must delegate implementation to Opus and verify the returned model identity.
+  Do not silently substitute Sol for an unavailable Opus worker.
 - Pull-request review routes to `pr-reviewer`; read-only codebase or subsystem
   investigation routes to `research-investigator`.
 - Focused mechanical work with objective acceptance criteria routes to
@@ -67,11 +74,14 @@ type, do not stop or ask the user to choose another type. Spawn a `default` agen
 with the selected role's responsibilities in its prompt and apply these explicit
 model settings:
 
-- `feature-implementer` and `pr-reviewer`: GPT-6 Sol with `high` effort.
-- `research-investigator`: GPT-6 Sol with `medium` effort.
+- `feature-implementer`: Claude Opus 5.5 with `high` effort through
+  `launch-opus-agents` and Claude Code, using the route above rather than a
+  `default` Codex implementation agent.
+- `pr-reviewer`: GPT-6.2 Sol with `high` effort.
+- `research-investigator`: GPT-6.2 Sol with `xhigh` effort.
 - `bounded-worker` and `session-explorer`: GPT-6 Luna with `medium` effort.
 - `careful-worker` and `session-analyzer`: GPT-6 Luna with `high` effort.
-- `datadog-miner`: GPT-6 Sol with `high` effort.
+- `datadog-miner`: GPT-6.2 Sol with `high` effort.
 
 Use a fresh or bounded history fork when an explicit model override is required, and
 include all task, skill, ownership, safety, and verification context needed by that
